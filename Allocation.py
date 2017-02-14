@@ -1,3 +1,6 @@
+'''
+Edited by Sankalp Vairat
+'''
 class Allocation:
 
 	def __init__(self,task,assigned_VM):
