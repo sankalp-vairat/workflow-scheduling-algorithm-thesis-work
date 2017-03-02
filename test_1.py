@@ -25,6 +25,7 @@ from Allocation import Allocation
 from multiprocessing import Queue
 import threading
 from generator import *
+from multiprocessing.sharedctypes import _new_value
 #import randlevel
 
 #----------------------------------------DECLARE GLOBAL VARIABLES------------------------------------------------
@@ -880,7 +881,38 @@ def merge_sort(probability_list,temp_ACO_list,l,r):
         merge_sort(probability_list, temp_ACO_list, l, m)
         merge_sort(probability_list, temp_ACO_list, m+1, r)
         merge(probability_list,temp_ACO_list,l,m,r)
-        
+
+
+
+def roulette_wheel(probability_list,limit):
+    '''
+    Function:    Roulette wheel selection
+    Input:       
+    Output:      
+
+    '''
+    len_roulette = len(probability_list)
+    
+    cumulative_probability_list = []
+    
+    cumulative_probability = 0.0
+     
+    for i in range(len_roulette):
+        cumulative_probability = cumulative_probability + probability_list[i]
+        cumulative_probability_list.append(cumulative_probability)
+    
+    random_probability = random.uniform(0,limit)
+    
+    index = 0
+    
+    for i in range(len_roulette):
+        if(random_probability <= cumulative_probability_list[i]):
+            index = i
+            break
+    
+    return index
+
+
 def normalize(list):
     '''
     Function:    Normalizes the list values using min-max scalar
@@ -1016,10 +1048,13 @@ def select_task(temp_ACO_list):
         
     for i in range(temp_len):    
         alpha_pheromone_mult_beta_eta = alpha_pheromone_mult_beta_eta + (pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) * (1 - ( eta_task_list[i] ** beta_eta ))
-
+        
     #----------------------------------------------------------------------------------------------------------------------------
 
+
+
     #probability calculation for edge selection----------------------------------------------------------------------------------
+    '''
     flag_above_threshold=False
     for i in range(temp_len):
         if(pheromone_task_level[temp_ACO_list[i]]>tau_0_task):
@@ -1045,9 +1080,61 @@ def select_task(temp_ACO_list):
             #probability_of_selection_list.append( random.betavariate( ( pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) , ( eta_task_list[i] ** beta_eta )  ) *( ( pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) * ( eta_task_list[i] ** beta_eta )  ) / ( alpha_pheromone_mult_beta_eta ) )
             except ZeroDivisionError as err:
                 probability_of_selection_list.append(1)
-    merge_sort(probability_of_selection_list, temp_ACO_list,0,temp_len-1)
+    '''
+    probability_of_selection_list = []
+    for i in range(temp_len):
+        try:
+            probability_of_selection_list.append( ( ( pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) * ( 1-((eta_task_list[i]) ** beta_eta ))  ) / ( alpha_pheromone_mult_beta_eta ) )
+        except ZeroDivisionError as err:
+            probability_of_selection_list.append(1)
+
+    '''
+    sum = 0
+    for i in range(temp_len):
+        sum = sum + probability_of_selection_list[i]
+    
+    print sum
+    '''
+
+    temp_probability_of_selection_list = []
+
+    for i in range(temp_len):
+        temp_probability_of_selection_list.append(probability_of_selection_list[i])
+
+    limit = 1.0
+    temp_ACO_list_1 = []
+    for  i in range(temp_len):
+        index = roulette_wheel(temp_probability_of_selection_list, limit)
+        temp_ACO_list_1.append(temp_ACO_list[index])
+        temp_probability = temp_probability_of_selection_list[index]
+        old_limit = limit
+        limit = limit - temp_probability
+        del temp_probability_of_selection_list[index]
+        del temp_ACO_list[index]
+        recalculate_probability(temp_probability_of_selection_list, limit, old_limit)
+    
+    #temp_ACO_list = list(temp_ACO_list_1)
+    return temp_ACO_list_1
         
-                                
+        
+          
+    #merge_sort(probability_of_selection_list, temp_ACO_list,0,temp_len-1)
+
+
+
+def recalculate_probability( list, new_limit ,old_limit):
+    '''
+    Function:    recalculates the probability out of new limit 
+    Input:       
+    Output:      
+
+    '''
+    temp_len = len(list)
+    for i in range(temp_len):
+        new_value = (list[i] / old_limit) * new_limit
+        list[i] = new_value 
+    
+                            
 global min_delta_SLAV_list
 min_delta_SLAV_list=[]    
 
@@ -1062,7 +1149,7 @@ def ACO():
     print "Executing ACO"
     print "ACO_LIST",ACO_list
 
-    num_Ants=50
+    num_Ants=15
     iterations=10
     
  
@@ -1116,7 +1203,7 @@ def ACO():
             storage_required_global_list = []
             deadline_required_global_list = []
             
-            select_task(temp_ACO_list)
+            temp_ACO_list = select_task(temp_ACO_list)
             ant_position = ACO_list_len-1
             
             for ant_position in range(ant_position,-1,-1):
@@ -1202,6 +1289,7 @@ def ACO():
                 #----------------------------------------------------------------------------------------------------------------------------
                 
                 #probability calculation for edge selection----------------------------------------------------------------------------------
+                '''
                 flag_above_threshold=False
                 probability_of_selection_list=[]
                 if(flag_above_threshold==True):
@@ -1209,10 +1297,10 @@ def ACO():
                         try:
                             if(pheromone_VM_level[temp_ACO_list[i]] > tau_0_task ):
                                 Q = random.uniform(0,1)
-                                probability_of_selection_list.append( ( ( pheromone_VM_level[temp_ACO_list[ant_position]][i] ** alpha_pheromone ) * ( 1-((Q*eta_list[i]) ** beta_eta ))  ) / ( alpha_pheromone_mult_beta_eta ) )
+                                probability_of_selection_list.append( ( ( pheromone_VM_level[temp_ACO_list[ant_position]][i] ** alpha_pheromone ) * ( 1-((eta_list[i]) ** beta_eta ))  ) / ( alpha_pheromone_mult_beta_eta ) )
                             else:
                                 probability_of_selection_list.append(0)
-            #probability_of_selection_list.append( random.betavariate( ( pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) , ( eta_task_list[i] ** beta_eta )  ) *( ( pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) * ( eta_task_list[i] ** beta_eta )  ) / ( alpha_pheromone_mult_beta_eta ) )
+                                #probability_of_selection_list.append( random.betavariate( ( pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) , ( eta_task_list[i] ** beta_eta )  ) *( ( pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) * ( eta_task_list[i] ** beta_eta )  ) / ( alpha_pheromone_mult_beta_eta ) )
                         except ZeroDivisionError as err:
                             probability_of_selection_list.append(1)
     
@@ -1220,19 +1308,35 @@ def ACO():
                     for i in range(p_column_VM):
                         try:
                             Q = random.uniform(0,1)
-                            probability_of_selection_list.append( ( ( pheromone_VM_level[temp_ACO_list[ant_position]][i] ** alpha_pheromone ) * ( 1-((Q*eta_list[i]) ** beta_eta ))  ) / ( alpha_pheromone_mult_beta_eta ) )
-            #probability_of_selection_list.append( random.betavariate( ( pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) , ( eta_task_list[i] ** beta_eta )  ) *( ( pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) * ( eta_task_list[i] ** beta_eta )  ) / ( alpha_pheromone_mult_beta_eta ) )
+                            probability_of_selection_list.append( ( ( pheromone_VM_level[temp_ACO_list[ant_position]][i] ** alpha_pheromone ) * ( 1-((eta_list[i]) ** beta_eta ))  ) / ( alpha_pheromone_mult_beta_eta ) )
+                            #probability_of_selection_list.append( random.betavariate( ( pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) , ( eta_task_list[i] ** beta_eta )  ) *( ( pheromone_task_level[temp_ACO_list[i]] ** alpha_pheromone ) * ( eta_task_list[i] ** beta_eta )  ) / ( alpha_pheromone_mult_beta_eta ) )
                         except ZeroDivisionError as err:
                             probability_of_selection_list.append(1)
+                            
+                '''
+                probability_of_selection_list=[]
+                for i in range(p_column_VM):
+                    try:
+                        probability_of_selection_list.append( ( ( pheromone_VM_level[temp_ACO_list[ant_position]][i] ** alpha_pheromone ) * ( 1-((eta_list[i]) ** beta_eta ))  ) / ( alpha_pheromone_mult_beta_eta ) )
+                    except ZeroDivisionError as err:
+                        probability_of_selection_list.append(1)
+                
 
                 largest_probability_index = 0
                 largest_probability = 0
-
+                
+                '''
                 temp_len_prob = len(probability_of_selection_list)
                 for i in range(temp_len_prob):
                     if(largest_probability < probability_of_selection_list[i] and i not in VM_outof_resources):
                         largest_probability = probability_of_selection_list[i]
                         largest_probability_index = i
+                '''
+                index = roulette_wheel(probability_of_selection_list, 1.0)
+                
+                if(index not in VM_outof_resources):
+                    largest_probability_index = index
+                    largest_probability = probability_of_selection_list[index]
                 
                 if(largest_probability==0 and largest_probability_index==0):
                     secondary_temp_ACO_list.append(temp_ACO_list[ant_position])

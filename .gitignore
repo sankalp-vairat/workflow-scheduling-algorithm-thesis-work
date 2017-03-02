@@ -1,2 +1,6 @@
 .project
 .pydevproject
+generator/*.pyc
+*.pyc
+*.xml
+*.txt
