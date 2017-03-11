@@ -3,10 +3,10 @@ Created on 21-Feb-2017
 
 @author: itadmin
 '''
-from Power.Pe import Pe
-from Power.PowerHost import PowerHost
-from Power.PowerModelLinear import PowerModelLinear
-from Power.PowerModelSpecPowerHpProLiantMl110G3PentiumD930 import PowerModelSpecPowerHpProLiantMl110G3PentiumD930
+from power.Pe import Pe
+from power.PowerHost import PowerHost
+from power.PowerModelLinear import PowerModelLinear
+from power.PowerModelSpecPowerHpProLiantMl110G3PentiumD930 import PowerModelSpecPowerHpProLiantMl110G3PentiumD930
 
 pe1 = Pe(12000)
 pe2 = Pe(8000)

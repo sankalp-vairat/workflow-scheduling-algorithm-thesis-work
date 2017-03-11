@@ -3,7 +3,7 @@ Created on 16-Feb-2017
 
 @author: itadmin
 '''
-from Power.PowerModel import PowerModel
+from power.PowerModel import PowerModel
 import math
 
 class PowerModelLinear(PowerModel):

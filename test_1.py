@@ -44,7 +44,7 @@ visited_tasks = []
 
 #global DAG                              #DAG indicates dependency and precedence between the tasks
 
-global VM                               #Column represents 1->Processing Units 2->Computing Power per PE 3->Storage available per VM
+global VM                               #Column represents 1->Processing Units 2->Computing power per PE 3->Storage available per VM
 
 global VM_temp                          #After every travel of ant k we will have temp allocation for the VM
 VM_temp = []                        
@@ -1115,8 +1115,6 @@ def select_task(temp_ACO_list):
     
     #temp_ACO_list = list(temp_ACO_list_1)
     return temp_ACO_list_1
-        
-        
           
     #merge_sort(probability_of_selection_list, temp_ACO_list,0,temp_len-1)
 

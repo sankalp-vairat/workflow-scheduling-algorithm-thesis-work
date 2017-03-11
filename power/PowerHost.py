@@ -3,8 +3,8 @@ Created on 16-Feb-2017
 
 @author: itadmin
 '''
-from Power.HostDynamicWorkload import HostDynamicWorkload
-from Power.PowerModel import PowerModel
+from power.HostDynamicWorkload import HostDynamicWorkload
+from power.PowerModel import PowerModel
 import sys
 
 class PowerHost(HostDynamicWorkload):

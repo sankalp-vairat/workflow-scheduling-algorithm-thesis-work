@@ -3,7 +3,7 @@ Created on 16-Feb-2017
 
 @author: itadmin
 '''
-from Power.Pe import Pe
+from power.Pe import Pe
 
 class Host:
     peList = []

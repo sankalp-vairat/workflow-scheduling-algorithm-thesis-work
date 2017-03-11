@@ -3,7 +3,7 @@ Created on 21-Feb-2017
 
 @author: itadmin
 '''
-from Power.Host import Host
+from power.Host import Host
 
 class HostDynamicWorkload(Host):
     utilizationMips = 0

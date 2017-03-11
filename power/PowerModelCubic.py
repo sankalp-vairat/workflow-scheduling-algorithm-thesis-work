@@ -4,10 +4,10 @@ Created on 16-Feb-2017
 @author: itadmin
 '''
 
-from Power.PowerModel import PowerModel
+from power.PowerModel import PowerModel
 import math
 
-class PowerModelSquare(PowerModel):
+class PowerModelCubic(PowerModel):
 
     maxPower = 0.0
     constant = 0.0
@@ -16,7 +16,7 @@ class PowerModelSquare(PowerModel):
     def __init__(self,maxPower,staticPowerPercent):
         self.maxPower=maxPower
         self.setStaticPower(self,staticPowerPercent * maxPower)
-        self.setConstant(self.maxpower - self.getStaticPower()/math.pow(100,2))
+        self.setConstant(self.maxpower - self.getStaticPower()/math.pow(100,3))
 
     def getPower(self,utilization):
         if(utilization < 0 and utilization >1 ):
@@ -27,7 +27,7 @@ class PowerModelSquare(PowerModel):
         if(utilization == 0):
             return 0
         
-        return self.getStaticPower() + self.getConstant() * math.pow(utilization * 100,2)
+        return self.getStaticPower() + self.getConstant() * math.pow(utilization * 100, 3)
 
     def setStaticPower(self,staticPower):
         self.staticPower = staticPower
