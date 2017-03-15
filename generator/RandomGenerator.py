@@ -3,7 +3,7 @@ Created on 11-Mar-2017
 
 @author: itadmin
 '''
-from random import randint
+from random import randint, random
 from power.Host import Host
 
 class RandomGenerator():
@@ -14,7 +14,7 @@ class RandomGenerator():
         for i in range(numberOfHosts):
             host = Host() 
             host.setId(i)
-            host.setStorage(randint.uniform(0,maxStorage))
+            host.setStorage(randint.uniform(1,maxStorage))
             host.setpeList(None)
             hostList.append(host)
         
@@ -25,4 +25,13 @@ class RandomGenerator():
     def __randomPeListGenerator(self,hostList,maxMipsPerHost,maxPesPerHost):
         numberOfHosts = len(hostList)
         for i in range(numberOfHosts):
-            pass
+            noOfPesPerHost = randint.uniform(1,maxPesPerHost)
+            peList = []
+            for j in range(noOfPesPerHost):
+                mipsPerHost = randint.uniform(1,maxMipsPerHost)
+                peList.append(mipsPerHost)
+            hostList[i].setpeList(self, peList)
+            
+            
+    def randomWorkFlowGenerator(self):
+        pass
