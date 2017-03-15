@@ -3,9 +3,9 @@ Created on 15-Mar-2017
 
 @author: itadmin
 '''
-class task:
+class Task:
     
-    def __init__(self, id, namespace=None, name=None, runtime=0, MI=0 ,cores=1, parents=[], inputs=[], outputs=[]):
+    def __init__(self, id, namespace=None, name=None, runtime=0, MI=0 ,cores=1, parents=[], inputs=[], outputs = []):
         self.id = id
         self.name = name
         self.namespace = namespace
