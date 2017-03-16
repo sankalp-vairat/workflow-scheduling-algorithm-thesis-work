@@ -3,16 +3,18 @@ Created on 15-Mar-2017
 
 @author: itadmin
 '''
-from generator.RandomGenerator import RandomGenerator
+
 import random
 import math
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from generator.RandomGenerator import RandomGenerator
 from workflow.WorkFlow import WorkFlow
 from workflow.Task import Task
 from workflow.File import File
 from generator.UniformDistribution import UniformDistribution
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 KB = 1024
 MB = 1024*KB
