@@ -9,7 +9,7 @@ import math
 from workflow.WorkFlow import WorkFlow
 from workflow.Task import Task
 from workflow.File import File
-from UniformDistribution import UniformDistribution
+from generator.UniformDistribution import UniformDistribution
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -25,12 +25,12 @@ HOURS = 60*MINUTES
 
 class RandomWorkFlowGenerator(RandomGenerator):
     
-    def __init__(self,noOfTasks, noOfLevels, runTimeLowerBound, runTimeUpperBound, storageLowerbound, storageUpperBound, miLowerBound, miUpperBound):
+    def __init__(self,noOfTasks, noOfLevels, runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperBound):
         self.noOfTasks = noOfTasks
         self.noOfLevels = noOfLevels
         self.runTimeLowerBound = runTimeLowerBound
         self.runTimeUpperBound = runTimeUpperBound
-        self.storageLowerbound = storageLowerbound
+        self.storageLowerBound = storageLowerBound
         self.storageUpperBound = storageUpperBound
         self.miLowerBound = miLowerBound
         self.miUpperBound = miUpperBound
@@ -45,13 +45,13 @@ class RandomWorkFlowGenerator(RandomGenerator):
         return self.runTimeLowerBound
     
     def getRunTimeUpperBound(self):
-        return self.getRunTimeUpperBound()
+        return self.runTimeUpperBound
     
     def getStorageLowerBound(self):
-        return self.storageLowerbound
+        return self.storageLowerBound
     
     def getStorageUpperBound(self):
-        return self.storageUpperbound
+        return self.storageUpperBound
         
     def getMiLowerBound(self):
         return self.miLowerBound
@@ -113,7 +113,7 @@ class RandomWorkFlowGenerator(RandomGenerator):
         levels = [list() for l in range(0,L)]
         for i in range(0,N):
             tout = File("task_%d_out.dat"%i, size=sizeDist()*KB)
-            t = Task(id="task_%d"%i, namespace="rand", name="Task", runtime=runtimeDist()*SECONDS, MI=miDist(),outputs=[tout])
+            t = Task(id="task_%d"%i, namespace="rand", name="Task", runtime=runtimeDist()*SECONDS, MI=miDist(),storage = sizeDist()*KB,outputs=[tout])
             w.addJob(t)
             tasks.append(t)
         

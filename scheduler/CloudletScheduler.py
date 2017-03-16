@@ -16,3 +16,6 @@ def CloudletScheduler():
     
     def executeScheduler(self,scheulder):
         self.scheduler.execute()
+    
+    def execute(self, workflow, dataCentre):
+        pass

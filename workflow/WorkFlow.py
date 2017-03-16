@@ -3,6 +3,7 @@ Created on 15-Mar-2017
 
 @author: itadmin
 '''
+from workflow.DAG import DAG_Matrix
 
 global DAG
 DAG=[]
@@ -23,11 +24,16 @@ MINUTES = 60*SECONDS
 HOURS = 60*MINUTES
 
 class WorkFlow:
-    def __init__(self, name=None, description=None):
+    def __init__(self, name=None, description=None, DAG_matrix = None):
         self.name = name
         self.description = description
         self.tasks = set()
+        self.DAG_matrix = DAG_matrix
     
+    
+    def setDAG_Matrix(self,DAG_matrix):
+        self.DAG_matrix = DAG_matrix
+
     def addJob(self, task):
         self.tasks.add(task)
     
@@ -57,21 +63,23 @@ class WorkFlow:
         
         self._computeDataDependencies()
         
-        for j in self.jobs:
+        for j in self.tasks:
             temp_list=[]
-            for i in self.jobs:
+            for i in self.tasks:
                 temp_list.append(0)
             DAG.append(temp_list)
 
-        for j in self.jobs:
+        for j in self.tasks:
             MI.append(j.MI)
             deadline.append(j.runtime)
             storage.append(j.outputs.pop().size)
 
-        for j in self.jobs:
+        for j in self.tasks:
             for i in j.inputs:
                 name=i.name
                 task=int(name.split('_')[1])
                 parent_task= int(j.id.split('_')[1])
                 DAG[parent_task][task]=1
-        print DAG
+        
+        DAG_matrix = DAG_Matrix(DAG)
+        self.setDAG_Matrix(DAG_matrix)

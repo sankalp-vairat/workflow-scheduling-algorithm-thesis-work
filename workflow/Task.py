@@ -5,12 +5,13 @@ Created on 15-Mar-2017
 '''
 class Task:
     
-    def __init__(self, id, namespace=None, name=None, runtime=0, MI=0 ,cores=1, parents=[], inputs=[], outputs = []):
+    def __init__(self, id, namespace=None, name=None, runtime=0, MI=0,storage=0 ,cores=1, parents=[], inputs=[], outputs = []):
         self.id = id
         self.name = name
         self.namespace = namespace
         self.runtime = runtime
-        self.MI=MI
+        self.MI = MI
+        self.storage =  storage
         self.cores = cores
         self.inputs = set(inputs)
         self.outputs = set(outputs)
