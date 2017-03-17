@@ -3,7 +3,7 @@ Created on 15-Mar-2017
 
 @author: itadmin
 '''
-from workflow.DAG import DAG_Matrix
+from workflow.DAG_Matrix import DAG_Matrix
 
 global DAG
 DAG=[]

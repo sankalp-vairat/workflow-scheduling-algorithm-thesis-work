@@ -3,6 +3,7 @@ Created on 16-Mar-2017
 
 @author: itadmin
 '''
+
 class DAG_Matrix:
     def __init__(self,DAG_matrix):
         self.DAG_matrix = list()

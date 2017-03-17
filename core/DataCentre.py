@@ -4,7 +4,6 @@ Created on 11-Mar-2017
 @author: itadmin
 '''
 from generator.RandomGenerator import RandomGenerator
-from urllib2 import randombytes
 
 class DataCentre():
     
