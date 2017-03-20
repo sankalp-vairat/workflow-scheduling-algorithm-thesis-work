@@ -80,6 +80,6 @@ class WorkFlow:
                 task=int(name.split('_')[1])
                 parent_task= int(j.id.split('_')[1])
                 DAG[parent_task][task]=1
-        
+
         DAG_matrix = DAG_Matrix(DAG)
         self.setDAG_Matrix(DAG_matrix)

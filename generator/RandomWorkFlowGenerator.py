@@ -27,7 +27,7 @@ HOURS = 60*MINUTES
 
 class RandomWorkFlowGenerator(RandomGenerator):
     
-    def __init__(self,noOfTasks, noOfLevels, runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperBound):
+    def __init__(self,noOfTasks, noOfLevels, runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperBound, type):
         self.noOfTasks = noOfTasks
         self.noOfLevels = noOfLevels
         self.runTimeLowerBound = runTimeLowerBound
@@ -36,6 +36,7 @@ class RandomWorkFlowGenerator(RandomGenerator):
         self.storageUpperBound = storageUpperBound
         self.miLowerBound = miLowerBound
         self.miUpperBound = miUpperBound
+        self.type = type 
         
     def getNoOfTasks(self):
         return self.noOfTasks
@@ -84,7 +85,14 @@ class RandomWorkFlowGenerator(RandomGenerator):
     
     def setMiUpperBound(self,miUpperBound):
         self.miUpperBound = miUpperBound
-    
+        
+    def setType(self,type):
+        self.type = type
+        
+    def getType(self):
+        return self.type
+
+
     def randomWorkFlowGenerator(self):
         noOfTasks = self.getNoOfTasks()
         noOfLevels = self.getNoOfLevels()
@@ -94,15 +102,142 @@ class RandomWorkFlowGenerator(RandomGenerator):
         storageUpperBound = self.getStorageUpperBound()
         miLowerBound = self.getMiLowerBound()
         miUpperbound = self.getMiUpperBound()
-        workflow = self._genworkflow(noOfTasks, noOfLevels,runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperbound)
+        type = self.getType()
+        workflow = self._genworkflow(noOfTasks, noOfLevels,runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperbound, type)
         workflow.createDAG()
-        
 
-    def _genworkflow(self, noOfTasks, noOfLevels,runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperbound):
-        return self.randlevel(noOfTasks, noOfLevels, UniformDistribution(runTimeLowerBound, runTimeUpperBound), UniformDistribution(storageLowerBound, storageUpperBound),UniformDistribution(miLowerBound, miUpperbound))
+
+    def _genworkflow(self, noOfTasks, noOfLevels,runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperbound, type):
+        if(type == 'RandomWorkFlow'):
+            return self.randomLevel(noOfTasks, noOfLevels, UniformDistribution(runTimeLowerBound, runTimeUpperBound), UniformDistribution(storageLowerBound, storageUpperBound),UniformDistribution(miLowerBound, miUpperbound))
+        elif(type == 'RandomParallelWorkFlow'):
+            return self.randomParallel(noOfTasks, noOfLevels, UniformDistribution(runTimeLowerBound, runTimeUpperBound), UniformDistribution(storageLowerBound, storageUpperBound),UniformDistribution(miLowerBound, miUpperbound))
+        elif(type == 'RandomForkJoinWorkFlow'):
+            return self.randomParallel(noOfTasks, noOfLevels, UniformDistribution(runTimeLowerBound, runTimeUpperBound), UniformDistribution(storageLowerBound, storageUpperBound),UniformDistribution(miLowerBound, miUpperbound))
+
+
+    def randomLevel(self,N, L, runtimeDist,sizeDist,miDist):
+        #    Approximate width of workflow
+        W = int(math.ceil(N/float(L)))
     
+        # Maximum in degree of a task
+        max_id = int(math.floor(W/float(2)))
     
-    def randlevel(self,N, L, runtimeDist,sizeDist,miDist):
+        w = WorkFlow(name="randomLevel", description="""Random Level-Oriented Workflow""")
+    
+        tasks = []
+        levels = [list() for l in range(0,L)]
+        for i in range(0,N):
+            tout = File("task_%d_out.dat"%i, size=sizeDist()*KB)
+            t = Task(id="task_%d"%i, namespace="rand", name="Task", runtime=runtimeDist()*SECONDS, MI=miDist(),storage = sizeDist()*KB,outputs=[tout])
+            w.addJob(t)
+            tasks.append(t)
+        
+            if i < L: # Ensure each level gets one task
+                levels[i].append(t)
+            else:
+                level = random.randint(0,L-1)
+                levels[level].append(t)
+    
+        # Choose random children for root level
+        # Make sure each root task gets a child
+        for t in levels[0]:
+            k = random.randint(1, min(max_id, len(levels[1])))
+        
+            children = random.sample(levels[1], k)
+        
+            for c in children:
+                for i in t.outputs:
+                    c.addInput(i)
+    
+        # For levels 1..L choose random parents
+        for l in range(1,L):
+            for t in levels[l]:
+                k = random.randint(1, min(max_id, len(levels[l-1])))
+            
+                # make sure level 1 doesn't get too many connections to level 0
+                k = max(0, k - len(t.inputs))
+            
+                parents = random.sample(levels[l-1], k)
+                for p in parents:
+                    for o in p.outputs:
+                        t.addInput(o)
+    
+        return w
+
+
+    def randomParallel(self,N, L, runtimeDist,sizeDist,miDist):
+        # Approximate width of workflow
+        W = int(math.ceil(N-2/float(L)))
+    
+        # Maximum in degree of a task
+        max_id = 1
+    
+        w = WorkFlow(name="randomParallel", description="""Random Parallel Level-Oriented Workflow""")
+    
+        tasks = []
+        levels = [list() for l in range(0,L)]
+        
+        # Add entry task node in level 0
+        tout = File("task_%d_out.dat"%0, size=sizeDist()*KB)
+        t = Task(id="task_%d"%0, namespace="rand", name="Task", runtime=runtimeDist()*SECONDS, MI=miDist(),storage = sizeDist()*KB,outputs=[tout])
+        w.addJob(t)
+        tasks.append(t)
+        levels[0].append(t)
+
+        # Randomly assign tasks to each level
+        for i in range(1,N-1):
+            tout = File("task_%d_out.dat"%i, size=sizeDist()*KB)
+            t = Task(id="task_%d"%i, namespace="rand", name="Task", runtime=runtimeDist()*SECONDS, MI=miDist(),storage = sizeDist()*KB,outputs=[tout])
+            w.addJob(t)
+            tasks.append(t)
+        
+            if i < L-1: # Ensure each level gets one task
+                levels[i].append(t)
+            else:
+                level = random.randint(1,L-2)
+                levels[level].append(t)
+
+        # Set level 0 task parent for each task in level 1
+        for children in levels[1]:
+            for i in levels[0][0].outputs:
+                children.addInput(i)
+
+        # For levels 2..L-2 choose random parents
+        globalAvailableTasks = []
+        for l in range(2,L-1):
+            for lt in levels[l-1]:
+                globalAvailableTasks.append(lt)
+            for t in levels[l]:
+                k = random.randint(0,len(globalAvailableTasks)-1)
+                
+                parent = globalAvailableTasks[k]
+                
+                del globalAvailableTasks[k]
+                
+                for o in parent.outputs:
+                    t.addInput(o)
+
+        # Add exit task to last level
+        tout = File("task_%d_out.dat"%(N-1), size=sizeDist()*KB)
+        t = Task(id="task_%d"%(N-1), namespace="rand", name="Task", runtime=runtimeDist()*SECONDS, MI=miDist(),storage = sizeDist()*KB,outputs=[tout])
+        w.addJob(t)
+        tasks.append(t)
+        levels[L-1].append(t)
+        
+        # Add all the task from the second last level
+        for lt in levels[L-2]:
+            globalAvailableTasks.append(lt)
+        
+        # Set level L-2 parent task and all the task which does not have children to level L-1 level task
+        for t in globalAvailableTasks:
+                for i in t.outputs:
+                    levels[L-1][0].addInput(i)
+         
+        return w
+
+
+    def randomForkJoin(self,N, L, runtimeDist,sizeDist,miDist):
         #    Approximate width of workflow
         W = int(math.ceil(N/float(L)))
     
@@ -150,6 +285,5 @@ class RandomWorkFlowGenerator(RandomGenerator):
                         t.addInput(o)
     
         return w
-        
         
         
