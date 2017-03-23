@@ -3,7 +3,7 @@ Created on 11-Mar-2017
 
 @author: itadmin
 '''
-from generator.RandomGenerator import RandomGenerator
+from generator.randomgenerator import RandomGenerator.RandomGenerator
 
 class DataCentre():
     

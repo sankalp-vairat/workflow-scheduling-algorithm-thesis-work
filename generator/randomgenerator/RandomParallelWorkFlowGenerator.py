@@ -9,7 +9,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from generator.RandomGenerator import RandomGenerator
+from generator.randomgenerator import RandomGenerator.RandomGenerator
 from workflow.WorkFlow import WorkFlow
 from workflow.Task import Task
 from workflow.File import File

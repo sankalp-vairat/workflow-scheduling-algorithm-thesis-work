@@ -6,7 +6,7 @@ Created on Mar 16, 2017
 
 
 
-from generator.RandomWorkFlowGenerator import RandomWorkFlowGenerator
+from generator.randomgenerator import RandomWorkFlowGenerator.RandomWorkFlowGenerator
 
 
 randomWorkFlowGenerator = RandomWorkFlowGenerator(8,4,10,20,10,20,10,20,"RandomForkJoinWorkFlow")
