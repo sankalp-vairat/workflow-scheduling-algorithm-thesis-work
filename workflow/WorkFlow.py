@@ -62,7 +62,7 @@ class WorkFlow:
         global deadline
         
         self._computeDataDependencies()
-        
+
         for j in self.tasks:
             temp_list=[]
             for i in self.tasks:
