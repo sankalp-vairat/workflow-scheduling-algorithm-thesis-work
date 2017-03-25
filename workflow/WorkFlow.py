@@ -77,8 +77,8 @@ class WorkFlow:
         for j in self.tasks:
             for i in j.inputs:
                 name=i.name
-                task=int(name.split('_')[1])
-                parent_task= int(j.id.split('_')[1])
+                task=int(name.split('_')[1][2:])
+                parent_task= int(j.id.split('_')[1][2:])
                 DAG[parent_task][task]=1
 
         DAG_matrix = DAG_Matrix(DAG)
