@@ -5,6 +5,7 @@ Created on 11-Mar-2017
 '''
 from random import randint, random
 from power.Host import Host
+from power.Pe import Pe
 from core.VM import VM
 
 class RandomGenerator():
@@ -26,13 +27,15 @@ class RandomGenerator():
         hostList = []
 
         for i in range(numberOfHosts):
-            host = Host() 
-            host.setId(i)
-            host.setStorage(randint.uniform(1,maxStorage))
-            host.setpeList(None)
+            host = Host(id =  i ) 
+            #host.setId(i)
+            host.setStorage(randint(1,maxStorage))
+            #host.setpeList(None)
+            #host.setVMList(None)
             hostList.append(host)
         
         self.__randomPeListGenerator(hostList,maxMipsPerPe,maxPesPerHost)
+        self.__randomVMListGenerator(hostList)
             
         return hostList
     
@@ -40,18 +43,19 @@ class RandomGenerator():
         
         numberOfHosts = len(hostList)
         for i in range(numberOfHosts):
-            noOfPesPerHost = randint.uniform(1,maxPesPerHost)
-            peList = []
+            noOfPesPerHost = randint(1,maxPesPerHost)
+            #peList = []
             for j in range(noOfPesPerHost):
-                mipsPerPe = 1000 * randint.uniform(1,maxMipsPerPe)
-                peList.append(mipsPerPe)
-            hostList[i].setpeList(self, peList)
+                mipsPerPe = 1000 * randint(1,maxMipsPerPe)
+                hostList[i].addPe(Pe(mipsPerPe))
+                #peList.append()
+            #hostList[i].setpeList(self, peList)
             
     def __randomVMListGenerator(self,hostList):
         
         globalVMId = 0
         for host in hostList:
-            noOfVMsPerHost = random.randint(1,len(host.getpelist()))
+            noOfVMsPerHost = randint(1,len(host.getpelist()))
             VMList = []
             noOfPes = host.getpelist()
             i = 0;
@@ -61,13 +65,21 @@ class RandomGenerator():
                     vmId = str(host.id)+':' + str(vmId)
                     vm = VM(id = vmId,host = host,globalVMId = globalVMId)
                     vm.addPeList(pe)
+                    #host.addVm(vm)
                     VMList.append(vm)
+                    globalVMId = globalVMId +1
                 else:
-                    vmIndex = random.randint(0,len(VMList))
+                    vmIndex = randint(0,len(VMList))
                     VMList[vmIndex].addPeList(pe)  
                 i = i + 1
-                globalVMId = globalVMId +1
-                
+
+            size = host.storage
+            for  vm in VMList:
+                  vm.storage = int(size / noOfVMsPerHost)
+            for j in range(size % noOfVMsPerHost):
+                VMList[j].storage += 1
+            
+            host.setVMList(VMList)
             
                  
     def randomWorkFlowGenerator(self):

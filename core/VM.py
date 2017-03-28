@@ -1,11 +1,11 @@
- '''
+'''
 Created on 11-Mar-2017
 
 @author: itadmin
 '''
-def VM():
+class VM:
 
-    def __init__(self,id,globalId , host ,mips, storage, currentAllocatedMips, currentAllocatedSize):
+    def __init__(self,id ,globalVMId , host ,mips = 1, storage =1 , currentAllocatedMips = None , currentAllocatedSize = None):
         self.id = id
         self.mips = mips
         self.peList = list()
@@ -13,7 +13,7 @@ def VM():
         self.currentAllocatedMips = currentAllocatedMips
         self.currentAllocatedSize = currentAllocatedSize
         self.host =  host
-        self.globalId = globalId
+        self.globalVMId = globalVMId
     
     def setTotalMips(self):
         mips = 0
@@ -40,7 +40,7 @@ def VM():
         return self.id
     
     def addPeList(self,pe):
-        self.peList(pe)
+        self.peList.append(pe)
     
     def getHost(self):
         return self.host

@@ -6,13 +6,14 @@ Created on 16-Feb-2017
 from power.Pe import Pe
 
 class Host:
-    peList = []
-    VMList = []
-    def __init__(self,id,storage,peList,VMList):
+
+    def __init__(self,id = 0 ,storage = 1,peList = None,VMList = None):
         self.id = id
         self.storage = storage
-        self.setpeList(peList)
-        self.setVMList(VMList)
+        self.peList = list()
+        self.VMList = list()        
+        #self.setpeList(peList)
+        #self.setVMList(VMList)
 
     def setId(self,id):
         self.id = id
@@ -25,7 +26,11 @@ class Host:
     
     def getStorage(self):
         return self.storage
-            
+    
+    def  addPe(self,pe):
+        self.peList.append(pe)
+    def addVm(self,vm):
+        self.VMList.append(vm)        
     def setpeList(self,peList):
         for i in range(len(peList)):
             self.peList.append(peList[i])
