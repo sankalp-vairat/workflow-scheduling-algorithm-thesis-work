@@ -7,10 +7,12 @@ from power.Pe import Pe
 
 class Host:
     peList = []
-    def __init__(self,id,storage,peList):
+    VMList = []
+    def __init__(self,id,storage,peList,VMList):
         self.id = id
         self.storage = storage
         self.setpeList(peList)
+        self.setVMList(VMList)
 
     def setId(self,id):
         self.id = id
@@ -27,6 +29,13 @@ class Host:
     def setpeList(self,peList):
         for i in range(len(peList)):
             self.peList.append(peList[i])
+            
+    def setVMList(self,VMList):
+        for i in range(len(VMList)):
+            self.VMList.append(VMList[i])
+            
+    def getVMList(self):
+        return self.VMList
 
     def getpelist(self):
         return self.peList

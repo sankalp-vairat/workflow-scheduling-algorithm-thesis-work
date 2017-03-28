@@ -1,21 +1,46 @@
-'''
+ '''
 Created on 11-Mar-2017
 
 @author: itadmin
 '''
 def VM():
-    
-    def __init__(self,id , host ,mips, numberOfPes, storage, currentAllocatedMips, currentAllocatedSize):
+
+    def __init__(self,id,globalId , host ,mips, storage, currentAllocatedMips, currentAllocatedSize):
         self.id = id
         self.mips = mips
-        self.numberOfPes =numberOfPes
-        self.storage= storage 
+        self.peList = list()
+        self.storage= storage
         self.currentAllocatedMips = currentAllocatedMips
         self.currentAllocatedSize = currentAllocatedSize
         self.host =  host
+        self.globalId = globalId
+    
+    def setTotalMips(self):
+        mips = 0
+        for pe in self.peList:
+            mips = mips + pe.mips
+        self.mips = mips
+        self.currentAllocatedMips = mips
+        
+    def setOldStorage(self):
+        self.cuurentAllocatedSize = self.storage
+        
+    def setNewMips(self,mips):
+        self.currentAllocatedMips =  self.currentAllocatedMips - mips
+        if(self.currentAllocatedMips < 0):
+            self.currentAllocatedMips = 0
+        
+    def setNewStorage(self,storage):
+        self.currentAllocatedSize = self.currentAllocatedSize - storage
+        if(self.currentAllocatedSize < 0):
+            self.currentAllocatedSize = 0 
+        
     
     def getid(self):
         return self.id
+    
+    def addPeList(self,pe):
+        self.peList(pe)
     
     def getHost(self):
         return self.host
@@ -26,7 +51,7 @@ def VM():
     def getNumberOfPes(self):
         return self.numberOfPes
     
-    def getStoarage(self):
+    def getStorage(self):
         return self.storage
     
     def getCurrentAllocatedmips(self):
@@ -47,7 +72,7 @@ def VM():
     def setNumberOfPes(self,numberOfPes):
         self.numberOfPes = numberOfPes
     
-    def setStoarage(self,storage):
+    def setStorage(self,storage):
         self.storage = storage
     
     def setCurrentAllocatedmips(self,currentAllocatedMips):
