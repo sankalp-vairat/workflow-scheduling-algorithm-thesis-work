@@ -5,35 +5,26 @@ Created on 29-Mar-2017
 '''
 from scheduler.CloudletScheduler import CloudletScheduler
 
-global dependencyMatrix 
-dependencyMatrix = []
-
-global DAGRows
-global DAGColumns
 
 class CloudletSchedulerUtil(CloudletScheduler):
     
-    def dependencyfinder(self,DAG):
+    def findRootTasks(self,DAG):
         '''
-        Function:    finds the dependencies count for each task in the DAG
-        Input:       Adjecency matrix representation of DAG
-        Output:      List of tasks that are starting point of DAG (dependencies)
+        Function:  find the starting tasks in the DAG
+        Input:     Adjecency matrix representation of DAG
+        Output:    List of tasks that are starting point of DAG
 
-        ''' 
-        print "finding dependencies count for each task ......."
+        '''
+        print "finding starting tasks in dependency graph......."
 
-        global DAGRows
-        global DAGColumns
-        global dependencyMatrix
-
-        DAGRows = len(DAG)
-        DAGColumns = len(DAG[0])
-
-        for row in range(DAGRows):
-            count=0
-            for column in range(DAGColumns):
+        starting_vertices=[];
+        for row in range(DAG.DAGRows):
+            start_v=True
+            for column in range(DAG.DAGColumns):
                 if(DAG[row][column]==1):
-                    count=count+1
-            dependencyMatrix.append(count)
+                    start_v=False
+                    continue;
+            if(start_v==True):
+                starting_vertices.append(row)
         
-        return dependencyMatrix
+        return starting_vertices

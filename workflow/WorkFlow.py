@@ -24,18 +24,29 @@ MINUTES = 60*SECONDS
 HOURS = 60*MINUTES
 
 class WorkFlow:
+
+
     def __init__(self, name=None, description=None, DAG_matrix = None):
         self.name = name
         self.description = description
         self.tasks = set()
         self.DAG_matrix = DAG_matrix
-    
-    
+        self.taskDict = {}
+        self.createTaskDictionary()
+
+
+    def createTaskDictionary(self):
+        for task in self.tasks:
+            self.taskDict.update({task.id:task})
+
+
     def setDAG_Matrix(self,DAG_matrix):
         self.DAG_matrix = DAG_matrix
 
+
     def addJob(self, task):
         self.tasks.add(task)
+
     
     def _computeDataDependencies(self):
         """This sets all the parent-child dependencies based on the input and output files of the jobs"""
@@ -54,6 +65,7 @@ class WorkFlow:
             for i in j.inputs:
                 if i in sources:
                     j.addParent(sources[i])
+
                     
     def createDAG(self):
         global DAG

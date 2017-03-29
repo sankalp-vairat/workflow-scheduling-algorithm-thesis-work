@@ -14,6 +14,8 @@ class Cloudlet():
         self.finishTime = 0
         self.resList = resList
         self.workFlow = copy.deepcopy(workFlow)
+        self.energyConsumption = 0
+        self.SLAViolation = 0 
         
     def getCloudletId(self):
         return self.clouletId

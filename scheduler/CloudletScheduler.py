@@ -19,3 +19,6 @@ def CloudletScheduler():
     
     def execute(self, workflow, dataCentre):
         pass
+    
+    def findRootTasks(self,DAG):
+        pass

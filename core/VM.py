@@ -5,13 +5,15 @@ Created on 11-Mar-2017
 '''
 class VM:
 
-    def __init__(self,id ,globalVMId , host ,mips = 1, storage =1 , currentAllocatedMips = None , currentAllocatedSize = None):
+    def __init__(self,id ,globalVMId , host ,mips = 1, storage =1 , currentAllocatedMips = None , currentAllocatedStorage = None, currentAvailableMips = None , currentAvailableStorage = None):
         self.id = id
         self.mips = mips
         self.peList = list()
         self.storage= storage
         self.currentAllocatedMips = currentAllocatedMips
-        self.currentAllocatedSize = currentAllocatedSize
+        self.currentAllocatedStorage = currentAllocatedStorage
+        self.currentAvailableMips = currentAvailableMips
+        self.currentAvailableStorage = currentAvailableStorage
         self.host =  host
         self.globalVMId = globalVMId
     
@@ -20,10 +22,12 @@ class VM:
         for pe in self.peList:
             mips = mips + pe.mips
         self.mips = mips
-        self.currentAllocatedMips = mips
+        self.currentAllocatedMips = 0
+        self.currentAvailableMips = mips
         
     def setOldStorage(self):
-        self.cuurentAllocatedSize = self.storage
+        self.currentAllocatedStorage = 0
+        self.currentAvailableStorage = self.storage
         
     def setNewMips(self,mips):
         self.currentAllocatedMips =  self.currentAllocatedMips - mips
@@ -31,9 +35,9 @@ class VM:
             self.currentAllocatedMips = 0
         
     def setNewStorage(self,storage):
-        self.currentAllocatedSize = self.currentAllocatedSize - storage
-        if(self.currentAllocatedSize < 0):
-            self.currentAllocatedSize = 0 
+        self.currentAllocatedStorage = self.currentAllocatedStorage - storage
+        if(self.currentAllocatedStorage < 0):
+            self.currentAllocatedStorage = 0 
         
     
     def getid(self):
@@ -57,8 +61,8 @@ class VM:
     def getCurrentAllocatedmips(self):
         return self.currentAllocatedMips
     
-    def getcurrentAllocatedSize(self):
-        return self.currentAllocatedSize
+    def getcurrentAllocatedStorage(self):
+        return self.currentAllocatedStorage
     
     def setid(self,id):
         self.id = id
@@ -78,5 +82,5 @@ class VM:
     def setCurrentAllocatedmips(self,currentAllocatedMips):
         self.currentAllocatedMips = currentAllocatedMips
     
-    def setcurrentAllocatedSize(self,currentAllocatedSize):
-        self.currentAllocatedSize = currentAllocatedSize
+    def setcurrentAllocatedStorage(self,currentAllocatedStorage):
+        self.currentAllocatedSize = currentAllocatedStorage
