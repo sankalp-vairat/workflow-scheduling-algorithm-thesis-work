@@ -12,7 +12,7 @@ class PowerModelLinear(PowerModel):
     constant = 0.0
     staticPower = 0.0
 
-    def __init__(self,maxPower,staticPowerPercent):
+    def __init__(self,maxPower = 250,staticPowerPercent= 50):
         self.maxPower=maxPower
         self.setStaticPower(staticPowerPercent*maxPower)
         self.setConstant(self.maxPower - self.getStaticPower() / 100)

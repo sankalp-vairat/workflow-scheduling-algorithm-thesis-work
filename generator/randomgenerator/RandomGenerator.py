@@ -5,6 +5,7 @@ Created on 11-Mar-2017
 '''
 from random import randint, random
 from power.Host import Host
+from power.PowerHost import PowerHost
 from power.Pe import Pe
 from core.VM import VM
 
@@ -27,7 +28,7 @@ class RandomGenerator():
         hostList = []
 
         for i in range(numberOfHosts):
-            host = Host(id =  i ) 
+            host = PowerHost(id =  i ) 
             #host.setId(i)
             host.setStorage(randint(1,maxStorage))
             #host.setpeList(None)

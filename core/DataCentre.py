@@ -3,41 +3,38 @@ Created on 11-Mar-2017
 
 @author: itadmin
 '''
-from generator.randomgenerator import RandomGenerator.RandomGenerator
+
+from generator.randomgenerator.RandomGenerator import RandomGenerator
 
 class DataCentre():
-    
-    def __init__(self,id,hostList,vmList):
+
+    def __init__(self,id):
         self.id = id
-        self.hostList = hostList
-        self.vmList = vmList
-        
+        self.hostList = list()
+        self.vmList = list()
+
     def getId(self):
         return self.id
-    
+
     def getHostList(self):
         return self.hostList
-    
-    def getVmList(self):
+
+    def getVMList(self):
         return self.vmList
-    
+
     def setId(self,id):
         self.id = id
-    
-    def setHostList(self,hostList):
-        self.hostList = hostList
-    
-    def setVmList(self,vmList):
-        self.vmList = vmList
-        
-    def createHostList(self,numberOfHosts,maxStorage):
-        randomGenerator = RandomGenerator()
-        self.setHostList(randomGenerator.randomHostGenerator(numberOfHosts,maxStorage))
-        
-    def createPeList(self,maxPesPerHost,maxMipsPerHost):
-        randomGenerator = RandomGenerator()
-        randomGenerator.randomPeListGenerator(self.hostList, maxMipsPerHost, maxPesPerHost)
 
-        
-    
-        
+    def __setHostList(self,hostList):
+        for host in hostList:
+            self.hostList.append(hostList)
+
+    def __setVmList(self,hostList):
+        for host in hostList:
+            for vm in host.vmList:
+                self.vmList.append(vm)
+
+    def setUpDatacentre(self,numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost):
+        randomGenerator = RandomGenerator()
+        self.__setHostList(randomGenerator.randomHostGenerator(numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost))
+        self.__setVmList(self.getHostList())

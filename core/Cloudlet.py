@@ -3,26 +3,23 @@ Created on 11-Mar-2017
 
 @author: itadmin
 '''
-
+import copy
 class Cloudlet():
     
-    def __init__(self,cloudletId,userId,numberOfPes,status,execStartTime,finishTime,resList):
+    def __init__(self,cloudletId,userId,status,execStartTime,resList,workFlow):
         self.clouletId = cloudletId
         self.useId = userId
-        self.numberOfPes = numberOfPes
         self.status = status
         self.execStartTime = execStartTime
-        self.finishTime = finishTime
+        self.finishTime = 0
         self.resList = resList
+        self.workFlow = copy.deepcopy(workFlow)
         
     def getCloudletId(self):
         return self.clouletId
     
     def getUseId(self):
         return self.useId
-    
-    def getNumberOfPes(self):
-        return self.numberOfPes
     
     def getStatus(self):
         return self.status
@@ -42,9 +39,6 @@ class Cloudlet():
     def setUseId(self,userId):
         self.useId = userId
     
-    def setNumberOfPes(self, numberOfPes):
-        self.numberOfPes = numberOfPes
-    
     def setStatus(self,status):
         self.status = status
     
@@ -56,6 +50,6 @@ class Cloudlet():
     
     def setResList(self,resList):
         self.resList = resList
-    
-    
-    
+
+    def getWorkFlow(self):
+        return self.workFlow

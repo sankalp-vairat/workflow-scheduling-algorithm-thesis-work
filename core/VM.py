@@ -79,9 +79,4 @@ class VM:
         self.currentAllocatedMips = currentAllocatedMips
     
     def setcurrentAllocatedSize(self,currentAllocatedSize):
-        self.currentAllocatedSize = currentAllocatedSize   
-    
-   
-    
-    
-    
+        self.currentAllocatedSize = currentAllocatedSize

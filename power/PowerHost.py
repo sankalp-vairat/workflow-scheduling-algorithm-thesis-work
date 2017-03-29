@@ -6,11 +6,12 @@ Created on 16-Feb-2017
 from power.HostDynamicWorkload import HostDynamicWorkload
 from power.PowerModel import PowerModel
 import sys
+from power.PowerModelLinear import PowerModelLinear
 
 class PowerHost(HostDynamicWorkload):
     powerModel = PowerModel()
-    def __init__(self,id1,storage,peList,powerModel):
-        HostDynamicWorkload.__init__(self,id1, storage, peList)
+    def __init__(self,id,storage=0,peList=None,powerModel = PowerModelLinear()):
+        HostDynamicWorkload.__init__(self,id, storage, peList)
         self.powerModel = powerModel
     
     def getPowerModel(self):

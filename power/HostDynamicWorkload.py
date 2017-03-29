@@ -9,8 +9,8 @@ class HostDynamicWorkload(Host):
     utilizationMips = 0
     previousUtilizationMips = 0
     
-    def __init__(self,id1,storage,peList):
-        Host.__init__(self,id1, storage, peList)
+    def __init__(self,id,storage,peList):
+        Host.__init__(self,id, storage, peList)
         self.utilizationMips = 0
         self.previousUtilizationMips = 0
         

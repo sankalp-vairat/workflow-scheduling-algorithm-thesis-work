@@ -8,6 +8,8 @@ class DAG_Matrix:
     def __init__(self,DAG_matrix):
         self.DAG_matrix = list()
         self.setDAG_matrix(DAG_matrix)
+        self.DAGRows = len(DAG_matrix)
+        self.DAGColumns = len(DAG_matrix[0])
         
     def setDAG_matrix(self,DAG_matrix):
         noOfRows = len(DAG_matrix)
