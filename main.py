@@ -19,6 +19,7 @@ from core.DataCentre import DataCentre
 from scheduler.CloudletScheduler import CloudletScheduler
 from core.Cloudlet import Cloudlet
 import time
+import threading
 
 #syntheticGenerator =SyntheticGenerator('CyberShake_30.xml')
 
@@ -33,3 +34,5 @@ myopic = MyopicScheduler()
 cloudletScheduler = CloudletScheduler(myopic)
 cloudlet = Cloudlet(cloudletId = 1,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow)
 cloudletScheduler.executeScheduler(cloudlet,dataCentre)
+print "Myopic ended"
+print threading.active_count()

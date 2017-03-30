@@ -93,19 +93,21 @@ class MyopicScheduler(CloudletScheduler):
         finally:
             rlock.release()
 
+
     def __resetVMs(self):
         for vm in self.vmList:
             vm.setTotalMips()
             vm.setOldStorage()
 
     def __myopicSchedulerUtil(self):
-        while True:
+        while(noOfTasks < self.DAG_matrix.DAGRows):
+            print "hello"
             self.__synchronizedQueue(1,0)
             time.sleep(5)
+        #threading.current_thread().__stop()
 
     def __myopicScheduler(self):
-        
-        print "hello"
+
         global W_deadline
         global W_mi
         global W_storage
@@ -137,8 +139,8 @@ class MyopicScheduler(CloudletScheduler):
             allocation = Allocation(task.id,self.vmList[vmIndex].id,self.vmList[vmIndex].globalVMId)
 
             #SLA violation calculation
-            SLAVMi = SLAVMi + task.MI - self.vmList[vmIndex].currentAvailableMips
-            SLAVStorage = SLAVStorage + task.storage - self.vmList[vmIndex].currentAvailableStorage
+            SLAVMi = SLAVMi + (task.MI - self.vmList[vmIndex].currentAvailableMips)
+            SLAVStorage = SLAVStorage + (task.storage - self.vmList[vmIndex].currentAvailableStorage)
             SLAVRuntime = SLAVRuntime + minimumExecTime 
 
             totalMi = totalMi + task.MI
@@ -154,7 +156,7 @@ class MyopicScheduler(CloudletScheduler):
             
             noOfTasks = noOfTasks + 1
         
-        SLAViolation = (SLAVMi / totalMi) * W_mi + (SLAVStorage  / totalStorage) * W_storage + (SLAVRuntime / totalRuntime) * W_deadline
+        SLAViolation = (( 0 if SLAVMi < 0 else SLAVMi) / totalMi) * W_mi + ( (0 if SLAVStorage < 0 else SLAVStorage)  / totalStorage) * W_storage + ((0 if SLAVRuntime < 0 else SLAVRuntime) / totalRuntime) * W_deadline
         self.cloudlet.addSLAViolationList(SLAViolation)
         
         for vm in self.vmList:
@@ -189,4 +191,5 @@ class MyopicScheduler(CloudletScheduler):
             self.cloudlet.finishTime = time.asctime()
 
             print "Execution finish time::",self.cloudlet.finishTime
-
+            
+            
