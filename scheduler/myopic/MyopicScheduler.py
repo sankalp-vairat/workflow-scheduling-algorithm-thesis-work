@@ -11,6 +11,16 @@ import copy
 from multiprocessing import Queue
 from threading import Thread
 from scheduler.Allocation import Allocation
+from scheduler.CloudletSchedulerUtil import CloudletSchedulerUtil
+import threading
+import sys
+
+global cloudletSchedulerUtil
+cloudletSchedulerUtil = CloudletSchedulerUtil()
+
+global rlock                            #rentrant lock for the synchronized method
+rlock = threading.RLock()
+
 
 global global_queue
 global_queue = Queue()
@@ -18,6 +28,17 @@ global_queue = Queue()
 global myopicList
 myopicList = []
 
+global W_mi
+W_mi = 0.2
+
+global W_storage
+W_storage = 0.4
+
+global W_deadline
+W_deadline = 0.4
+
+global noOfTasks
+noOfTasks = 0
 
 class MyopicScheduler(CloudletScheduler):
 
@@ -25,7 +46,7 @@ class MyopicScheduler(CloudletScheduler):
         cloudlet = None
         workflow = None
         vmList = None
-        DAG = None
+        DAG_matrix = None
         dependencyMatrix = None
 
     def execute(self,cloudlet,dataCentre):
@@ -33,18 +54,17 @@ class MyopicScheduler(CloudletScheduler):
         self.workflow = self.cloudlet.getWorkFlow()
         cloudlet.setExecStartTime(time.asctime())
         self.vmList = copy.deepcopy(dataCentre.getVMList())
-        self.DAG = self.workflow.DAG_matrix
-        self.dependencyMatrix = self.DAG.dependencyMatrix
+        self.DAG_matrix = self.workflow.DAG_matrix
         
-        rootTasksIndexes = self.cloudletScheduler.findRootTasks(self.DAG)
-        
-        starting_thread = Thread(target=self.__myopicSchedulerUtil(), args=())
-        #starting_thread.daemon = True
-        starting_thread.start()
-        
-        
+        self.dependencyMatrix = self.DAG_matrix.dependencyMatrix
+        rootTasksIndexes = cloudletSchedulerUtil.findRootTasks(self.DAG_matrix)
+
         for rootTaskIndex in rootTasksIndexes:
             self.__synchronizedQueue(2,rootTaskIndex)
+            
+        starting_thread = Thread(target = self.__myopicSchedulerUtil(), args = ())
+        #starting_thread.daemon = True
+        starting_thread.start()
 
     def __synchronizedQueue(self,choice,pos):
         '''
@@ -56,57 +76,117 @@ class MyopicScheduler(CloudletScheduler):
         '''
         global global_queue
         global rlock
-    
+
         rlock.acquire()
         try:
-            if(choice==1):
-                flag=False
+            if(choice == 1):
+                flag = False
                 while(global_queue.qsize() != 0):
-                    flag=True
+                    flag = True
                     myopicList.append(global_queue.get())
-                if(flag==True):
+                if(flag == True):
                     self.__resetVMs()
-                    self.__myopicScheduler(self.cloudlet, self.workflow, self.vmList, self.DAG, self.dependencyMatrix)
-            if(choice==2):
-                if(self.dependencyMatrix[pos]==0):
+                    self.__myopicScheduler()
+            if(choice == 2):
+                if(self.dependencyMatrix[pos] == 0):
                     global_queue.put(pos)
         finally:
             rlock.release()
 
     def __resetVMs(self):
         for vm in self.vmList:
-            vm.setTosetTotalMips()
+            vm.setTotalMips()
             vm.setOldStorage()
 
     def __myopicSchedulerUtil(self):
         while True:
-            self.synchronized_queue(1,0)
+            self.__synchronizedQueue(1,0)
             time.sleep(5)
 
     def __myopicScheduler(self):
+        
+        print "hello"
+        global W_deadline
+        global W_mi
+        global W_storage
+        global noOfTasks
+        
         allocationList = []
-        for taskIndex in global_queue:
-            task = self.workflow.taskDict.get(taskIndex)
+        SLAVMi = 0
+        SLAVStorage = 0
+        SLAVRuntime = 0
+
+        totalMi = 0
+        totalStorage = 0
+        totalRuntime = 0
+
+        for taskIndex in myopicList:
+            task = self.workflow.taskDict.get(str(taskIndex))
             execTimeList = []
-            minimumExecTime = 0
+            minimumExecTime =  sys.float_info.max 
             for vm in self.vmList:
                 try:
-                    execTime = (task.mips / vm.currentAllocatedMips)
+                    execTime = (task.MI / vm.currentAvailableMips)
                     execTimeList.append(execTime)
                     if(minimumExecTime > execTime):
-                        minimumExecTime = execTime                     
+                        minimumExecTime = execTime     
                 except ZeroDivisionError:
                     execTimeList.append(None)
-            
-            vmIndex = execTime.index(minimumExecTime)
+
+            vmIndex = execTimeList.index(minimumExecTime)
             allocation = Allocation(task.id,self.vmList[vmIndex].id,self.vmList[vmIndex].globalVMId)
-            self.vmList[vmIndex].currentAvailableMips = (self.vmList[vmIndex].currentAvailableMips - task.mips) if (self.vmList[vmIndex].currentAvailableMips - task.mips) >=  0 else 0
+
+            #SLA violation calculation
+            SLAVMi = SLAVMi + task.MI - self.vmList[vmIndex].currentAvailableMips
+            SLAVStorage = SLAVStorage + task.storage - self.vmList[vmIndex].currentAvailableStorage
+            SLAVRuntime = SLAVRuntime + minimumExecTime 
+
+            totalMi = totalMi + task.MI
+            totalStorage = totalStorage + task.storage 
+            totalRuntime = totalRuntime + task.runtime
+
+            self.vmList[vmIndex].currentAvailableMips = (self.vmList[vmIndex].currentAvailableMips - task.MI) if (self.vmList[vmIndex].currentAvailableMips - task.MI) >=  0 else 0
             self.vmList[vmIndex].currentAvailableStorage = (self.vmList[vmIndex].currentAvailableStorage - task.storage) if (self.vmList[vmIndex].currentAvailableStorage - task.storage) >=  0 else 0
-            self.vmList[vmIndex].currentAllocatedMips = (self.vmList[vmIndex].currentAllocatedMips + task.mips) if self.vmList[vmIndex].mips > (self.vmList[vmIndex].currentAllocatedMips + task.mips) else self.vmList[vmIndex].mips
+            self.vmList[vmIndex].currentAllocatedMips = (self.vmList[vmIndex].currentAllocatedMips + task.MI) if self.vmList[vmIndex].mips > (self.vmList[vmIndex].currentAllocatedMips + task.MI) else self.vmList[vmIndex].mips
             self.vmList[vmIndex].currentAllocatedStorage = (self.vmList[vmIndex].currentAllocatedStorage + task.storage) if self.vmList[vmIndex].storage > (self.vmList[vmIndex].currentAllocatedStorage + task.storage) else self.vmList[vmIndex].storage 
             allocationList.append(allocation)
-            self.vmList[vmIndex].host.utilizationMips = self.vmList[vmIndex].host.utilizationMips + self.vmList[vmIndex].currentAllocatedMips 
-
+            self.vmList[vmIndex].host.utilizationMips = self.vmList[vmIndex].host.utilizationMips + self.vmList[vmIndex].currentAllocatedMips
+            
+            noOfTasks = noOfTasks + 1
+        
+        SLAViolation = (SLAVMi / totalMi) * W_mi + (SLAVStorage  / totalStorage) * W_storage + (SLAVRuntime / totalRuntime) * W_deadline
+        self.cloudlet.addSLAViolationList(SLAViolation)
+        
         for vm in self.vmList:
             energyConsumed = vm.host.getPower()
             self.cloudlet.energyConsumption = self.cloudlet.energyConsumption + energyConsumed
+        
+        # Clearing the dependencies----------------------------------------------------------------------------------------------------------
+        for i in range(len(myopicList)):
+            for j in range(self.DAG_matrix.DAGRows):
+                if(self.DAG_matrix.DAG[j][myopicList[i]]==1):
+                    self.DAG_matrix.dependencyMatrix[j]=self.DAG_matrix.dependencyMatrix[j]-1
+                    if(self.DAG_matrix.dependencyMatrix[j]==0):
+                        self.__synchronizedQueue(2, j)
+
+        del myopicList[:]
+
+        if(noOfTasks == self.DAG_matrix.DAGRows):
+
+            print "Total Energy Consumed is ::",self.cloudlet.energyConsumption
+
+            sumSLAViolation = 0
+
+            for SLAViolation in self.cloudlet.SLAViolationList:
+                sumSLAViolation = sumSLAViolation + SLAViolation
+
+            averageSLAViolation = sumSLAViolation / len(self.cloudlet.SLAViolationList) 
+
+            print "Average SLA Violation is ::",averageSLAViolation
+
+            print "Execution Start Time::",self.cloudlet.execStartTime
+
+            self.cloudlet.finishTime = time.asctime()
+
+            print "Execution finish time::",self.cloudlet.finishTime
+

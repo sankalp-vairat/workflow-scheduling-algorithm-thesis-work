@@ -1275,9 +1275,9 @@ def ACO():
                     except ZeroDivisionError:
                         eta_list[i] = 1
                 #-----------------------------------------------------------------------------------------------------------------------------
-                
+
                 #Heuristic information calculation--------------------------------------------------------------------------------------------
-                
+
                 alpha_pheromone = 0.3                 # weightage for the pheromone
                 beta_eta = 0.4                        # weightage for the eta(heuristic information) 
                 alpha_pheromone_mult_beta_eta = 0
@@ -1630,8 +1630,6 @@ def synchronized_queue(choice,pos):
         rlock.release()
 
 
-   
-
 def Main_test_1():
     '''
     FUNCTION:      This function is the starting point of the code execution
@@ -1639,7 +1637,6 @@ def Main_test_1():
     OUTPUT:        none
     
     '''
-
     m_obj=Main()
     
     m_obj.main("-D","sankalp.xml")
@@ -1667,8 +1664,6 @@ def Main_test_1():
 
     
     print "total_time",total_time
-
-
 
 
 Main_test_1()

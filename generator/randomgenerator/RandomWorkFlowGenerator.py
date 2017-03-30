@@ -105,6 +105,7 @@ class RandomWorkFlowGenerator(RandomGenerator):
         type = self.getType()
         workflow = self._genworkflow(noOfTasks, noOfLevels,runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperbound, type)
         workflow.createDAG()
+        return workflow
 
 
     def _genworkflow(self, noOfTasks, noOfLevels,runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperbound, type):

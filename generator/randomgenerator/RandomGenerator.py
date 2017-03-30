@@ -70,7 +70,7 @@ class RandomGenerator():
                     VMList.append(vm)
                     globalVMId = globalVMId +1
                 else:
-                    vmIndex = randint(0,len(VMList))
+                    vmIndex = randint(0,len(VMList)-1)
                     VMList[vmIndex].addPeList(pe)  
                 i = i + 1
 

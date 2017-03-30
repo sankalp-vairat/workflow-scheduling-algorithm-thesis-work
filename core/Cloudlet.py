@@ -6,17 +6,19 @@ Created on 11-Mar-2017
 import copy
 class Cloudlet():
     
-    def __init__(self,cloudletId,userId,status,execStartTime,resList,workFlow):
+    def __init__(self,cloudletId,userId,status,execStartTime,workFlow):
         self.clouletId = cloudletId
         self.useId = userId
         self.status = status
         self.execStartTime = execStartTime
         self.finishTime = 0
-        self.resList = resList
         self.workFlow = copy.deepcopy(workFlow)
         self.energyConsumption = 0
-        self.SLAViolation = 0 
-        
+        self.SLAViolationList = list() 
+
+    def addSLAViolationList(self,SLAViolation):
+        self.SLAViolationList.append(SLAViolation)
+
     def getCloudletId(self):
         return self.clouletId
     

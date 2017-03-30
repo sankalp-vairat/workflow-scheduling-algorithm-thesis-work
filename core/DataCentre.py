@@ -6,7 +6,7 @@ Created on 11-Mar-2017
 
 from generator.randomgenerator.RandomGenerator import RandomGenerator
 
-class DataCentre():
+class DataCentre:
 
     def __init__(self,id):
         self.id = id
@@ -27,11 +27,11 @@ class DataCentre():
 
     def __setHostList(self,hostList):
         for host in hostList:
-            self.hostList.append(hostList)
+            self.hostList.append(host)
 
     def __setVmList(self,hostList):
         for host in hostList:
-            for vm in host.vmList:
+            for vm in host.VMList:
                 self.vmList.append(vm)
 
     def setUpDatacentre(self,numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost):

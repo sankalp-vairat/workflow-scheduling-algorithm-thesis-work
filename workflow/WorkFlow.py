@@ -32,12 +32,12 @@ class WorkFlow:
         self.tasks = set()
         self.DAG_matrix = DAG_matrix
         self.taskDict = {}
-        self.createTaskDictionary()
+        #self.createTaskDictionary()
 
 
     def createTaskDictionary(self):
         for task in self.tasks:
-            self.taskDict.update({task.id:task})
+            self.taskDict.update({task.id.split('_')[1]:task})
 
 
     def setDAG_Matrix(self,DAG_matrix):
@@ -89,8 +89,8 @@ class WorkFlow:
         for j in self.tasks:
             for i in j.inputs:
                 name=i.name
-                task=int(name.split('_')[1][2:])
-                parent_task= int(j.id.split('_')[1][2:])
+                task=int(name.split('_')[1]) #task=int(name.split('_')[1][2:])
+                parent_task= int(j.id.split('_')[1]) #parent_task= int(j.id.split('_')[1][2:])
                 DAG[parent_task][task]=1
 
         DAG_matrix = DAG_Matrix(DAG)

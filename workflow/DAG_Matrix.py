@@ -31,9 +31,9 @@ class DAG_Matrix:
         ''' 
         print "finding dependencies count for each task ......."
 
-        for row in range(self.DAG.DAGRows):
+        for row in range(self.DAGRows):
             count=0
-            for column in range(self.DAG.DAGColumns):
+            for column in range(self.DAGColumns):
                 if(self.DAG[row][column]==1):
                     count=count+1
             self.dependencyMatrix.append(count)

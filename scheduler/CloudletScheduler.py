@@ -3,7 +3,7 @@ Created on 11-Mar-2017
 
 @author: itadmin
 '''
-def CloudletScheduler():
+class CloudletScheduler():
     
     def __init__(self,scheduler):
         self.scheduler = scheduler
@@ -14,8 +14,8 @@ def CloudletScheduler():
     def getScheduler(self):
         return self.scheduler
     
-    def executeScheduler(self,scheulder):
-        self.scheduler.execute()
+    def executeScheduler(self,cloudlet,dataCentre):
+        self.scheduler.execute(cloudlet,dataCentre)
     
     def execute(self, workflow, dataCentre):
         pass
