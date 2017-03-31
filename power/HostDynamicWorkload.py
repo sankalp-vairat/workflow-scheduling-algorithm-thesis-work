@@ -31,3 +31,7 @@ class HostDynamicWorkload(Host):
         if (utilization > 1 and utilization < 1.01):
             utilization = 1;
         return utilization;
+    
+    def resetUtilizationMips(self):
+        self.utilizationMips = 0
+        
