@@ -22,6 +22,9 @@ class HostDynamicWorkload(Host):
     
     def setUtilizationMips(self,utilizationMips):
         self.utilizationMips = utilizationMips;
+        
+    def resetUtilizationMips(self):
+        self.utilizationMips = 0
     
     def setpreviousUtilizationMips(self,previousUtilizationMips):
         self.previousUtilizationMips = previousUtilizationMips

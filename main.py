@@ -15,6 +15,8 @@ from generator.randomgenerator.RandomGenerator import RandomGenerator
 
 from generator.syntheticgenerator.SyntheticGenerator import SyntheticGenerator
 from scheduler.myopic.MyopicScheduler import MyopicScheduler
+from scheduler.minminscheduler.MinMinScheduler import MinMinScheduler
+from scheduler.maxminscheduler.MaxMinScheduler import MaxMinScheduler
 from core.DataCentre import DataCentre
 from scheduler.CloudletScheduler import CloudletScheduler
 from core.Cloudlet import Cloudlet
@@ -30,8 +32,10 @@ dataCentre.setUpDatacentre(10, 10, 20, 5)
 randomGenerator = RandomWorkFlowGenerator(10,5,1,10,1,10,1000,10000,'RandomWorkFlow')
 workflow = randomGenerator.randomWorkFlowGenerator()
 workflow.createTaskDictionary()
-myopic = MyopicScheduler()
-cloudletScheduler = CloudletScheduler(myopic)
+#myopic = MyopicScheduler()
+#minMin = MinMinScheduler()
+maxMin = MaxMinScheduler()
+cloudletScheduler = CloudletScheduler(maxMin)
 cloudlet = Cloudlet(cloudletId = 1,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow)
 cloudletScheduler.executeScheduler(cloudlet,dataCentre)
 print "Myopic ended"
