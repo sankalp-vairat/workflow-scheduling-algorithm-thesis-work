@@ -33,9 +33,9 @@ randomGenerator = RandomWorkFlowGenerator(10,5,1,10,1,10,1000,10000,'RandomWorkF
 workflow = randomGenerator.randomWorkFlowGenerator()
 workflow.createTaskDictionary()
 #myopic = MyopicScheduler()
-#minMin = MinMinScheduler()
-maxMin = MaxMinScheduler()
-cloudletScheduler = CloudletScheduler(maxMin)
+minMin = MinMinScheduler()
+#maxMin = MaxMinScheduler()
+cloudletScheduler = CloudletScheduler(minMin)
 cloudlet = Cloudlet(cloudletId = 1,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow)
 cloudletScheduler.executeScheduler(cloudlet,dataCentre)
 print "Myopic ended"
