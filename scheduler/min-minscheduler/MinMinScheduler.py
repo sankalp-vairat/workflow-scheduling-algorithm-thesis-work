@@ -25,8 +25,8 @@ rlock = threading.RLock()
 global global_queue
 global_queue = Queue()
 
-global myopicList
-myopicList = []
+global minMinList
+minMinList = []
 
 global W_mi
 W_mi = 0.2
@@ -40,7 +40,7 @@ W_deadline = 0.4
 global noOfTasks
 noOfTasks = 0
 
-class MyopicScheduler(CloudletScheduler):
+class MinMInScheduler(CloudletScheduler):
 
     def __init__(self):
         self.cloudlet = None
@@ -83,11 +83,11 @@ class MyopicScheduler(CloudletScheduler):
                 flag = False
                 while(global_queue.qsize() != 0):
                     flag = True
-                    myopicList.append(global_queue.get())
+                    minMinList.append(global_queue.get())
                 if(flag == True):
                     self.__resetVMs()
                     self.__resetHosts
-                    self.__myopicScheduler()
+                    self.__minMinScheduler()
             if(choice == 2):
                 if(self.dependencyMatrix[pos] == 0):
                     global_queue.put(pos)
@@ -104,14 +104,14 @@ class MyopicScheduler(CloudletScheduler):
         for vm in self.vmList:
             vm.host.resetUtilizationMips()
 
-    def __myopicSchedulerUtil(self):
+    def __minMinSchedulerUtil(self):
         while(noOfTasks < self.DAG_matrix.DAGRows):
             print "hello"
             self.__synchronizedQueue(1,0)
             time.sleep(5)
         #threading.current_thread().__stop()
 
-    def __myopicScheduler(self):
+    def __minMinScheduler(self):
 
         global W_deadline
         global W_mi
