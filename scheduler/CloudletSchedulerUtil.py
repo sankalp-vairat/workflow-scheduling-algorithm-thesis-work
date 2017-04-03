@@ -56,4 +56,189 @@ class CloudletSchedulerUtil:
                     list[i]=0
                 else:
                     list[i] = 1
+
+
+#---------------------------------------PRINT UTILITY FUNCTIONS-----------------------------------------------------------------------
+    def printf(str):
+        '''
+        FUNCTION:      This function prints output to a file
+        INPUT:         
+        OUTPUT:        
+        (SIDE)EFFECTS: 
         
+        '''
+        f= open("Output.txt","a+")
+        f.write(str)
+        f.write("\n")
+        f.close()
+
+    def printf_1D_list(list_1D):
+        '''
+        FUNCTION:      This function prints 1D list
+        INPUT:         1D list
+        OUTPUT:        1D list
+        (SIDE)EFFECTS: 
+        
+        '''
+        f= open("Output.txt","a+")
+        for i in range(len(list_1D)): 
+            f.write(str(list_1D[i])+" ")
+        f.write("\n")
+        f.write("----------------------------------------------------")
+        f.write("\n")
+        f.close()
+
+    def printf_2D_list(list_2D):
+        '''
+        FUNCTION:      This function prints 1D list
+        INPUT:         2D list
+        OUTPUT:        2D list
+        (SIDE)EFFECTS: 
+        
+        '''
+        f= open("Output.txt","a+")
+        for i in range(len(list_2D)):
+            for j in range(len(list_2D[0])):
+                f.write(str(list_2D[i])+" ")
+            f.write("\n")
+        f.write("----------------------------------------------------")
+        f.write("\n")
+        f.close()
+
+    def print_1D_list(list_1D):
+        '''
+        FUNCTION:      This function prints 1D list
+        INPUT:         1D list
+        OUTPUT:        1D list
+        (SIDE)EFFECTS: 
+        
+        '''
+
+        for i in range(len(list_1D)):
+            print list_1D[i],
+        print ""
+
+    def print_2D_list(list_2D):
+        '''
+        FUNCTION:      This function prints 1D list
+        INPUT:         2D list
+        OUTPUT:        2D list
+        (SIDE)EFFECTS: 
+        
+        '''
+
+        for i in range(len(list_2D)):
+            for j in range(len(list_2D[0])):
+                print list_2D[i][j],
+        print ""
+
+    def print_allocations(ant_allocation_list,iteration,ant):
+        '''
+        FUNCTION:      This function prints 1D list
+        INPUT:         2D list
+        OUTPUT:        2D list
+        (SIDE)EFFECTS: 
+        
+        ''' 
+        
+        temp_len=len(ant_allocation_list)
+        
+        printf("Iteration::"+str(iteration)+"\t"+"Ant::"+str(ant))
+        for i in range(temp_len):
+            task = ant_allocation_list[i].task
+            VM = ant_allocation_list[i].assigned_VM
+            printf("Task:: "+str(task)+"\t"+"VM:: "+str(VM))
+
+    #-------------------------------------------------------------------------------------------------------------------------------------
+    #---------------------------------------PRINT UTILITY FUNCTIONS-----------------------------------------------------------------------
+    def printf(str):
+        '''
+        FUNCTION:      This function prints output to a file
+        INPUT:         
+        OUTPUT:        
+        (SIDE)EFFECTS: 
+        
+        '''
+        f= open("Output.txt","a+")
+        f.write(str)
+        f.write("\n")
+        f.close()
+
+    def printf_1D_list(list_1D):
+        '''
+        FUNCTION:      This function prints 1D list
+        INPUT:         1D list
+        OUTPUT:        1D list
+        (SIDE)EFFECTS: 
+        
+        '''
+        f= open("Output.txt","a+")
+        for i in range(len(list_1D)): 
+            f.write(str(list_1D[i])+" ")
+        f.write("\n")
+        f.write("----------------------------------------------------")
+        f.write("\n")
+        f.close()
+
+    def printf_2D_list(list_2D):
+        '''
+        FUNCTION:      This function prints 1D list
+        INPUT:         2D list
+        OUTPUT:        2D list
+        (SIDE)EFFECTS: 
+        
+        '''
+        f= open("Output.txt","a+")
+        for i in range(len(list_2D)):
+            for j in range(len(list_2D[0])):
+                f.write(str(list_2D[i])+" ")
+            f.write("\n")
+        f.write("----------------------------------------------------")
+        f.write("\n")
+        f.close()
+
+    def print_1D_list(list_1D):
+        '''
+        FUNCTION:      This function prints 1D list
+        INPUT:         1D list
+        OUTPUT:        1D list
+        (SIDE)EFFECTS: 
+        
+        '''
+
+        for i in range(len(list_1D)):
+            print list_1D[i],
+        print ""
+
+    def print_2D_list(list_2D):
+        '''
+        FUNCTION:      This function prints 1D list
+        INPUT:         2D list
+        OUTPUT:        2D list
+        (SIDE)EFFECTS: 
+        
+        '''
+
+        for i in range(len(list_2D)):
+            for j in range(len(list_2D[0])):
+                print list_2D[i][j],
+        print ""
+
+    def print_allocations(ant_allocation_list,iteration,ant):
+        '''
+        FUNCTION:      This function prints 1D list
+        INPUT:         2D list
+        OUTPUT:        2D list
+        (SIDE)EFFECTS: 
+        
+        ''' 
+        
+        temp_len=len(ant_allocation_list)
+        
+        printf("Iteration::"+str(iteration)+"\t"+"Ant::"+str(ant))
+        for i in range(temp_len):
+            task = ant_allocation_list[i].task
+            VM = ant_allocation_list[i].assigned_VM
+            printf("Task:: "+str(task)+"\t"+"VM:: "+str(VM))
+
+    #-------------------------------------------------------------------------------------------------------------------------------------

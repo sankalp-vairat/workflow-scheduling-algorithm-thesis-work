@@ -6,7 +6,6 @@ Created on 29-Mar-2017
 
 from scheduler.CloudletScheduler import CloudletScheduler
 import time
-from core.DataCentre import DataCentre
 import copy 
 from multiprocessing import Queue
 from threading import Thread
