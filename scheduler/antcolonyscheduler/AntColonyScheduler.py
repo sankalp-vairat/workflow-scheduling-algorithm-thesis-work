@@ -27,6 +27,9 @@ min_delta_SLAV_list=[]
 global global_queue
 global_queue = Queue()
 
+global total_time                       #total time taken for the execution of the DAG
+total_time = 0
+
 global ACO_list
 ACO_list = []
 
@@ -131,6 +134,13 @@ class AntColonyScheduler(CloudletScheduler):
 
         '''
         print "Initializing trails with pheromone :"
+        global pheromone_task_level
+        global pheromone_VM_level
+        global p_row_task
+        global p_column_task
+        global tau_0_task
+        global tau_0_VM
+        
         del pheromone_task_level [:]
         del pheromone_VM_level [:]
         
@@ -453,15 +463,18 @@ class AntColonyScheduler(CloudletScheduler):
         
      
         self.__initializePheromone();
-        
+
         global total_time
+
         
         secondary_temp_ACO_list=[]
 
         temp_ACO_list=[]
 
         iterations_allocation_list = []                            # This list stores the allocations for all the iterations
+
         SLAV_delta_tau_global_lists=[]
+
         for it in range(iterations): 
             ants_allocation_list = []                              # This list stores the allocation for all the ants
             SLAV_delta_tau_global_list = []
@@ -482,7 +495,7 @@ class AntColonyScheduler(CloudletScheduler):
                 storage_required_global_list = []
                 deadline_required_global_list = []
                 
-                temp_ACO_list = self.selectTask(temp_ACO_list)
+                temp_ACO_list = self.__selectTask(temp_ACO_list)
                 ant_position = ACO_list_len-1
                 
                 for ant_position in range(ant_position,-1,-1):
@@ -627,7 +640,7 @@ class AntColonyScheduler(CloudletScheduler):
                     
                     #------------------------------------------------------------------------------------------------------------------------
                             
-                    ant_allocation = Allocation(temp_ACO_list[ant_position],largest_probability_index)
+                    ant_allocation = Allocation(self.workflow.taskDict.get(temp_ACO_list[ant_position]).id,self.vmList[largest_probability_index].assignedVMId,self.vmList[largest_probability_index].globalVMId)
                     ant_allocation_list.append(ant_allocation)                  # puting this allocation in the list
                     count = count-1                                             # decrement the ACO list count
 
@@ -736,16 +749,16 @@ class AntColonyScheduler(CloudletScheduler):
         #total_MI_for_VM=[]
         VM_list_a={}
         for i in range(0,total_length):
-            if(VM_list_a.has_key(final_ant_allocation_list[i].assigned_VM)):
-                VM_list_a[final_ant_allocation_list[i].assigned_VM] = VM_list_a.get(final_ant_allocation_list[i].assigned_VM) + MI[final_ant_allocation_list[i].task]
+            if(VM_list_a.has_key(final_ant_allocation_list[i].globalVMid)):
+                VM_list_a[final_ant_allocation_list[i].globalVMid] = VM_list_a.get(final_ant_allocation_list[i].globalVMid) + self.workflow.taskDict.get(final_ant_allocation_list[i].taskId).MI
             else:
-                VM_list_a[final_ant_allocation_list[i].assigned_VM] = MI[final_ant_allocation_list[i].task]
+                VM_list_a[final_ant_allocation_list[i].globalVMid] = self.workflow.taskDict.get(final_ant_allocation_list[i].taskId).MI
         
         time_temp = 0   
         
         for k,v in VM_list_a.items():
             try:
-                time_temp = time_temp + v / VM_temp[k][0]
+                time_temp = time_temp + v / self.vmList.getMips()
             except ZeroDivisionError as err:
                 time_temp = sys.float_info.max
 
@@ -757,29 +770,33 @@ class AntColonyScheduler(CloudletScheduler):
         print "----------------------------------------------------------------------------------------------------------"
 
         # Clearing the dependencies----------------------------------------------------------------------------------------------------------
-        for j in range(self.DAG_matrix.DAGRows):
-            if(self.DAG_matrix.DAG[j][int(allocation.taskId)] == 1):
-                self.DAG_matrix.dependencyMatrix[j] = self.DAG_matrix.dependencyMatrix[j] - 1
-                if(self.DAG_matrix.dependencyMatrix[j] == 0):
+        for i in range(len(ACO_list)):
+            for j in range(DAG_column):
+                if(self.DAG_matrix.DAG[j][ACO_list[i]]==1):
+                    self.DAG_matrix.DAG.dependencies[j]=self.DAG_matrix.DAG.dependencies[j]-1
+                if(self.DAG_matrix.DAG.dependencies[j]==0):
                     self.__synchronizedQueue(2, j)
-
+        
         noOfTasks = noOfTasks + 1
 
         # reset ACO_List
         del ACO_list[:]
+        
         cloudletSchedulerUtil.printf("total_time"+str(total_time))
         sum=0
-        total_required_time=0
-        for i in range(len(deadline)):
-            total_required_time=total_required_time+deadline[i]
+        #total_required_time=0
+        #for i in range(len(deadline)):
+        #    total_required_time=total_required_time+deadline[i]
             
-        print "total_required_time",total_required_time
+        #print "total_required_time",total_required_time
         
         for i in range(len(min_delta_SLAV_list)):
             sum=sum + min_delta_SLAV_list[i]
         average_SLAV_delta_tau=sum/len(min_delta_SLAV_list)
+        
         print "average_SLAV_delta_tau",average_SLAV_delta_tau
         cloudletSchedulerUtil.printf("-----------------------------------------------------------------------------------------------------------")
+        
         if(len(secondary_temp_ACO_list)!=0):
             for d in range(len(secondary_temp_ACO_list)):
                 ACO_list.append(secondary_temp_ACO_list[d])
@@ -854,7 +871,7 @@ class AntColonyScheduler(CloudletScheduler):
                 if(flag == True):
                     self.__resetVMs()
                     self.__resetHosts()
-                    self.__maxMinScheduler()
+                    self.__ACOScheduler()
             if(choice == 2):
                 if(self.dependencyMatrix[pos] == 0):
                     global_queue.put(pos)
@@ -871,7 +888,7 @@ class AntColonyScheduler(CloudletScheduler):
         for vm in self.vmList:
             vm.host.resetUtilizationMips()
 
-    def __maxMinSchedulerUtil(self):
+    def __ACOSchedulerUtil(self):
         while(noOfTasks < self.DAG_matrix.DAGRows):
             print "hello"
             self.__synchronizedQueue(1,0)
