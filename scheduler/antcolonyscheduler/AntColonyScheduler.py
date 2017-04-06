@@ -452,7 +452,7 @@ class AntColonyScheduler(CloudletScheduler):
         global iterations
         
      
-        self.__initialize_pheromone();
+        self.__initializePheromone();
         
         global total_time
         
