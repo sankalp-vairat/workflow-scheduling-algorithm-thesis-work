@@ -461,6 +461,7 @@ class AntColonyScheduler(CloudletScheduler):
         print "Executing ACO"
         print "ACO_LIST",ACO_list
 
+        global total_time
         global no_Of_Ants
         global iterations
         
@@ -759,7 +760,7 @@ class AntColonyScheduler(CloudletScheduler):
             
             for k,v in VM_list_a.items():
                 try:
-                    time_temp = time_temp + v / self.vmList.getMips()
+                    time_temp = time_temp + v / self.vmList[k].getMips()
                 except ZeroDivisionError as err:
                     time_temp = sys.float_info.max
 
@@ -776,7 +777,7 @@ class AntColonyScheduler(CloudletScheduler):
             min_SLAV_delta_tau_index_i = 0
             min_SLAV_delta_tau_index_j = 0
             for i in range(len_SLAV_lists):
-                for j in range(len_SLAV_list):
+                for j in range(len(SLAV_delta_tau_global_lists[i])):
                     if(min_SLAV_delta_tau > SLAV_delta_tau_global_lists[i][j]):
                         min_SLAV_delta_tau = SLAV_delta_tau_global_lists[i][j]
                         min_SLAV_delta_tau_index_i = i
@@ -799,16 +800,16 @@ class AntColonyScheduler(CloudletScheduler):
             #total_MI_for_VM=[]
             VM_list_a={}
             for i in range(0,total_length):
-                if(VM_list_a.has_key(final_ant_allocation_list[i].globalVMid)):
-                    VM_list_a[final_ant_allocation_list[i].globalVMid] = VM_list_a.get(final_ant_allocation_list[i].globalVMid) + self.workflow.taskDict.get(final_ant_allocation_list[i].taskId).MI
+                if(VM_list_a.has_key(final_ant_allocation_list[i].assignedVMGlobalId)):
+                    VM_list_a[final_ant_allocation_list[i].assignedVMGlobalId] = VM_list_a.get(final_ant_allocation_list[i].assignedVMGlobalId) + self.workflow.taskDict.get(final_ant_allocation_list[i].taskId.split('_')[1]).MI
                 else:
-                    VM_list_a[final_ant_allocation_list[i].globalVMid] = self.workflow.taskDict.get(final_ant_allocation_list[i].taskId).MI
+                    VM_list_a[final_ant_allocation_list[i].assignedVMGlobalId] = self.workflow.taskDict.get(final_ant_allocation_list[i].taskID.split('_')[1]).MI
             
             time_temp = 0   
             
             for k,v in VM_list_a.items():
                 try:
-                    time_temp = time_temp + v / self.vmList.getMips()
+                    time_temp = time_temp + v / self.vmList[k].getMips()
                 except ZeroDivisionError as err:
                     time_temp = sys.float_info.max
 
@@ -826,8 +827,8 @@ class AntColonyScheduler(CloudletScheduler):
         for i in range(len(ACO_list)):
             for j in range(DAG_column):
                 if(self.DAG_matrix.DAG[j][ACO_list[i]]==1):
-                    self.DAG_matrix.DAG.dependencies[j]=self.DAG_matrix.DAG.dependencies[j]-1
-                if(self.DAG_matrix.DAG.dependencies[j]==0):
+                    self.DAG_matrix.dependencyMatrix[j]=self.DAG_matrix.dependencyMatrix[j]-1
+                if(self.DAG_matrix.dependencyMatrix[j]==0):
                     self.__synchronizedQueue(2, j)
         
         #noOfTasks = noOfTasks + 1
