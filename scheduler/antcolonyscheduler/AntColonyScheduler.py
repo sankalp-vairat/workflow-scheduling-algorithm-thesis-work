@@ -828,8 +828,8 @@ class AntColonyScheduler(CloudletScheduler):
             for j in range(DAG_column):
                 if(self.DAG_matrix.DAG[j][ACO_list[i]]==1):
                     self.DAG_matrix.dependencyMatrix[j]=self.DAG_matrix.dependencyMatrix[j]-1
-                if(self.DAG_matrix.dependencyMatrix[j]==0):
-                    self.__synchronizedQueue(2, j)
+                    if(self.DAG_matrix.dependencyMatrix[j]==0):
+                        self.__synchronizedQueue(2, j)
         
         #noOfTasks = noOfTasks + 1
 
