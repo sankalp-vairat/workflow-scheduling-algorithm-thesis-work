@@ -22,7 +22,7 @@ from scheduler.CloudletScheduler import CloudletScheduler
 from core.Cloudlet import Cloudlet
 import time
 import threading
-
+from scheduler.antcolonyscheduler.AntColonyScheduler import AntColonyScheduler
 #syntheticGenerator =SyntheticGenerator('CyberShake_30.xml')
 
 #syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
@@ -33,9 +33,10 @@ randomGenerator = RandomWorkFlowGenerator(10,5,1,10,1,10,1000,10000,'RandomWorkF
 workflow = randomGenerator.randomWorkFlowGenerator()
 workflow.createTaskDictionary()
 #myopic = MyopicScheduler()
-minMin = MinMinScheduler()
+#minMin = MinMinScheduler()
 #maxMin = MaxMinScheduler()
-cloudletScheduler = CloudletScheduler(minMin)
+antColonyScheduler = AntColonyScheduler()
+cloudletScheduler = CloudletScheduler(antColonyScheduler)
 cloudlet = Cloudlet(cloudletId = 1,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow)
 cloudletScheduler.executeScheduler(cloudlet,dataCentre)
 print "Myopic ended"

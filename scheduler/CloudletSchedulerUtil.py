@@ -145,8 +145,8 @@ class CloudletSchedulerUtil:
         
         self.printf("Iteration::"+str(iteration)+"\t"+"Ant::"+str(ant))
         for i in range(temp_len):
-            task = ant_allocation_list[i].task
-            VM = ant_allocation_list[i].assigned_VM
+            task = ant_allocation_list[i].taskID
+            VM = ant_allocation_list[i].assignedVMId
             self.printf("Task:: "+str(task)+"\t"+"VM:: "+str(VM))
 
     #-------------------------------------------------------------------------------------------------------------------------------------
