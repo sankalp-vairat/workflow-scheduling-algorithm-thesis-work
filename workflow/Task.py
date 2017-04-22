@@ -16,6 +16,7 @@ class Task:
         self.inputs = set(inputs)
         self.outputs = set(outputs)
         self.parents = set(parents)
+        self.currentCompletionTime = 0
     
     def addInput(self, file_):
         self.inputs.add(file_)
@@ -24,4 +25,10 @@ class Task:
         self.outputs.add(file_)
     
     def addParent(self, parent):
-        self.parents.add(parent)    
+        self.parents.add(parent)
+        
+    def setCurrentCompletionTime(self,currentCompletionTime):
+        self.currentCompletionTime = currentCompletionTime
+        
+    def resetCurrentCompletionTime(self):
+        self.currentCompletionTime = 0

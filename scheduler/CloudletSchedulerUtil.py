@@ -36,7 +36,15 @@ class CloudletSchedulerUtil:
         Output:      
 
         '''
+        
         length_list = len(list)
+        
+        '''
+        list = []
+
+        for i in range(length_list):
+            list.append(list[i])
+        '''    
         max = list[0]
         min = list[0]
                 
