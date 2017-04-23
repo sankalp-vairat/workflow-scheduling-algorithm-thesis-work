@@ -514,51 +514,54 @@ class AntColonyScheduler(CloudletScheduler):
         '''
         temp_len = len(ant_allocation_list)
         taskList = []
-        vmList = []
+        vmDict = {}
+
         for i in range(temp_len):
-            task = int(ant_allocation_list[i].taskID.split('_')[1])
-            taskList.append(self.workflow.taskDict.get(task))
-            VM = int(ant_allocation_list[i].assignedVMGlobalId)
-            self.vmList[VM].addTask(self.workflow.taskDict.get(task))
-            vmList.append(self.vmList[VM])
-        
-        
-        host = vm.host
-        totalUtilizationMips = 0
-        time_taken = 0
-        tasksList = []
-        for vm in vmList:
+            taskID = int(ant_allocation_list[i].taskID.split('_')[1])
+            taskList.append(self.workflow.taskDict.get(taskID))
+            vmID = int(ant_allocation_list[i].assignedVMGlobalId)
+            self.vmList[vmID].addTask(self.workflow.taskDict.get(taskID))
+            vmDict.update(vmID,self.vmList[vmID])
+
+        hostTasksBucket = {}
+        hostDict = {}
+        for vmID,vm in vmDict:
             numberOfTasksAssigned = len(vm.tasksAllocated)
+            totalUtilizationMips = 0
             for i in range(numberOfTasksAssigned):
-                totalUtilizationMips = totalUtilizationMips + vm.tasksAllocated[i].MI
-                #time_taken = vm.tasksAllocated[i].MI / vm.currentAvailableMips
-                #vm.tasksAllocated[i].currentCompletionTime = time_taken 
-                #vm.currentAvailableMips = vm.currentAvailableMips - vm.tasksAllocated[i].MI
-                #vm.currentAvailableMips = vm.currentAllocatedMips + vm.tasksAllocated[i].MI
-                tasksList.append(vm.tasksAllocated[i])
-                #host.utilizationMips = host.utilizationMips + vm.currentAllocatedMips
-        totalUtilizationMips = task.MI
-        tasksList.append(task)
-        numberOftasks = len(tasksList)
-        energyConsumed = []
-        tasksList.sort(key = lambda x: x.currentCompletionTime)
-        totalEnergyConsumed = 0
+                vm.host.utilizationMips = vm.host.utilizationMips + vm.tasksAllocated[i].MI
+
+                if(hostTasksBucket.has_key(vm.host.id)):
+                    hostTasksBucket.update(vm.host.id,hostTasksBucket.get(vm.host.id).append(vm.tasksAllocated[i]))
+                else:
+                    hostTasksBucket.update(vm.host.id,[vm.tasksAllocated[i]])
+
+                hostDict.update(vm.host.id,vm.host)
         
-        flag = True
-        timeSlice = 0.0
-        for i in range(numberOftasks):
-            if(flag == True):
-                utilizationMips = tasksList[i].MI
-            if((i+1 < numberOftasks) and tasksList[i].currentCompletionTime == tasksList[i+1].currentCompletionTime):
-                utilizationMips = utilizationMips + tasksList[i+1].MI
-                flag =False
-            else:
-                EnergyConsumed = host.getEnergy(totalUtilizationMips,host.getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
-                energyConsumed.append(EnergyConsumed)
-                totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
-                totalUtilizationMips = totalUtilizationMips - utilizationMips
-                timeSlice = tasksList[i].currentCompletionTime
-                flag =  True
+        for hostID,tasksList in hostTasksBucket:
+            hostTasksBucket.update(hostID,tasksList.sort(key = lambda x: x.currentCompletionTime))
+        
+        totalEnergyConsumed = 0
+        energyConsumed = [] 
+        for hostID,tasksList in hostTasksBucket:
+            numberOftasks = len(tasksList)
+            energyConsumedByHost = []
+            flag = True
+            timeSlice = 0.0
+            for i in range(numberOftasks):
+                if(flag == True):
+                    utilizationMips = tasksList[i].MI
+                if((i+1 < numberOftasks) and tasksList[i].currentCompletionTime == tasksList[i+1].currentCompletionTime):
+                    utilizationMips = utilizationMips + tasksList[i+1].MI
+                    flag =False
+                else:
+                    EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    energyConsumedByHost.append(EnergyConsumed)
+                    totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
+                    hostDict.get(hostID).utilizationMips = hostDict.get(hostID).utilizationMips - utilizationMips
+                    timeSlice = tasksList[i].currentCompletionTime
+                    flag =  True
+            energyConsumed.append(energyConsumedByHost)
         return totalEnergyConsumed
 
 
