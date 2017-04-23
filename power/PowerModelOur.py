@@ -15,12 +15,12 @@ class PowerModelOur(PowerModel):
 
     def __init__(self,maxPower = 250,staticPowerPercent= 50):
         self.maxPower=maxPower
-        self.setStaticPower(staticPowerPercent*maxPower)
-        self.setConstant(self.maxPower - self.getStaticPower() / 100)
+        self.setStaticPower(staticPowerPercent*maxPower/100)
+        #self.setConstant(self.maxPower - self.getStaticPower() / 100)
         
         
     def getEnergy(self,utilizationMips,totalMips,time):
-        return self.getPower(self,utilizationMips/totalMips) * time
+        return self.getPower((utilizationMips/totalMips), time) * time
         
     def getPower(self,utilization,time):
         if(utilization < 0 and utilization >1 ):
@@ -32,6 +32,7 @@ class PowerModelOur(PowerModel):
             return 0
         
         power = ((1 - (utilization))*self.staticPower + (utilization) * self.maxPower )
+        return power
 
     def setStaticPower(self,staticPower):
         self.staticPower = staticPower
