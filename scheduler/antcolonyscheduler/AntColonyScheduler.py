@@ -541,7 +541,7 @@ class AntColonyScheduler(CloudletScheduler):
         
         for hostID,tasksList in hostTasksBucket:
             hostTasksBucket.update(hostID,tasksList.sort(key = lambda x: x.currentCompletionTime))
-        
+        #new changes
         totalEnergyConsumed = 0
         energyConsumed = [] 
         for hostID,tasksList in hostTasksBucket:
