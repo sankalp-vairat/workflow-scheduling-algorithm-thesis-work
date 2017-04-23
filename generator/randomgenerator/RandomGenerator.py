@@ -11,7 +11,7 @@ from core.VM import VM
 
 class RandomGenerator():
     
-    def randomHostGenerator(self,numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost):
+    def randomHostGenerator(self,numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost,powerModel):
         
         if(numberOfHosts <= 0):
             raise ValueError("Number of hosts can't be less than or equal to 0..")
@@ -28,7 +28,7 @@ class RandomGenerator():
         hostList = []
 
         for i in range(numberOfHosts):
-            host = PowerHost(id =  i ) 
+            host = PowerHost(id =  i,powerModel = powerModel) 
             #host.setId(i)
             host.setStorage(randint(1,maxStorage))
             #host.setpeList(None)

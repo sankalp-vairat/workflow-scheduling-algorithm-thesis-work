@@ -34,7 +34,7 @@ class DataCentre:
             for vm in host.VMList:
                 self.vmList.append(vm)
 
-    def setUpDatacentre(self,numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost):
+    def setUpDatacentre(self,numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost,powerModel):
         randomGenerator = RandomGenerator()
-        self.__setHostList(randomGenerator.randomHostGenerator(numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost))
+        self.__setHostList(randomGenerator.randomHostGenerator(numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost,powerModel))
         self.__setVmList(self.getHostList())

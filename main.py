@@ -23,12 +23,14 @@ from core.Cloudlet import Cloudlet
 import time
 import threading
 from scheduler.antcolonyscheduler.AntColonyScheduler import AntColonyScheduler
+from power.PowerModelOur import PowerModelOur
 #syntheticGenerator =SyntheticGenerator('CyberShake_30.xml')
 
 #syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
 
 dataCentre = DataCentre(1)
-dataCentre.setUpDatacentre(10, 10, 20, 5) 
+powerModelOur = PowerModelOur()
+dataCentre.setUpDatacentre(10, 10, 20, 5,powerModelOur) 
 randomGenerator = RandomWorkFlowGenerator(10,5,1,10,1,10,1000,10000,'RandomWorkFlow')
 workflow = randomGenerator.randomWorkFlowGenerator()
 workflow.createTaskDictionary()

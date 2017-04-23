@@ -19,6 +19,9 @@ class PowerHost(HostDynamicWorkload):
     
     def setPowerModel(self,powerModel):
         self.powerModel = powerModel
+        
+    def getEnergy(self,utilizationMips,totalUtilizationMips,currentCompletionTime):
+        return self.powerModel.getEnergy(utilizationMips,totalUtilizationMips,currentCompletionTime)
     
     def getPower(self):
         return self.getPowerUtility(self.getUtilizationOfCPU())

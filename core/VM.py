@@ -16,6 +16,7 @@ class VM:
         self.currentAvailableStorage = currentAvailableStorage
         self.host =  host
         self.globalVMId = globalVMId
+        self.tasksAllocated = list()
     
     def setTotalMips(self):
         mips = 0
@@ -45,7 +46,10 @@ class VM:
     
     def addPeList(self,pe):
         self.peList.append(pe)
-    
+        
+    def addTask(self,task):
+        self.tasksAllocated.append(task)
+
     def getHost(self):
         return self.host
     
