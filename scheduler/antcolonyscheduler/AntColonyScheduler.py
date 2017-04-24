@@ -548,7 +548,9 @@ class AntColonyScheduler(CloudletScheduler):
                 vm.currentAvailableMips = vm.currentAvailableMips - vm.tasksAllocated[i].MI
                 vm.currentAvailableMips = vm.currentAllocatedMips + vm.tasksAllocated[i].MI
                 if(hostTasksBucket.has_key(vm.host.id)):
-                    hostTasksBucket.update({vm.host.id:hostTasksBucket.get(vm.host.id).append(vm.tasksAllocated[i])})
+                    tempList = hostTasksBucket.get(vm.host.id)
+                    tempList.append(vm.tasksAllocated[i])
+                    hostTasksBucket.update({vm.host.id:tempList})
                 else:
                     hostTasksBucket.update({vm.host.id:[vm.tasksAllocated[i]]})
 

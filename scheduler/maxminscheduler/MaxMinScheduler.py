@@ -110,6 +110,76 @@ class MaxMinScheduler(CloudletScheduler):
             time.sleep(5)
         #threading.current_thread().__stop()
 
+    def __calculateEnergyConsumptionOfSchedule(self,ant_allocation_list):
+        '''
+        Function:    calculates the partial energy consumption of schedule   
+        Input:       
+        Output:      
+
+        '''
+        
+        self.__resetHosts()
+        self.__resetVMs()
+        
+        temp_len = len(ant_allocation_list)
+        vmDict = {}
+
+        for i in range(temp_len):
+            taskID = int(ant_allocation_list[i].taskID)
+            vmID = int(ant_allocation_list[i].assignedVMGlobalId)
+            self.vmList[vmID].addTask(self.workflow.taskDict.get(str(taskID)))
+            vmDict.update({vmID:self.vmList[vmID]})
+
+        hostTasksBucket = {}
+        hostDict = {}
+        for vmID,vm in vmDict.iteritems():
+            numberOfTasksAssigned = len(vm.tasksAllocated)
+            for i in range(numberOfTasksAssigned):
+                vm.host.utilizationMips = vm.host.utilizationMips + vm.tasksAllocated[i].MI
+                try:
+                    time_taken = vm.tasksAllocated[i].MI / vm.currentAvailableMips
+                except ZeroDivisionError:
+                    time_taken = sys.float_info.max
+                vm.tasksAllocated[i].currentCompletionTime = time_taken 
+                vm.currentAvailableMips = vm.currentAvailableMips - vm.tasksAllocated[i].MI
+                vm.currentAvailableMips = vm.currentAllocatedMips + vm.tasksAllocated[i].MI
+                if(hostTasksBucket.has_key(vm.host.id)):
+                    tempList = hostTasksBucket.get(vm.host.id)
+                    tempList.append(vm.tasksAllocated[i])
+                    hostTasksBucket.update({vm.host.id:tempList})
+                else:
+                    hostTasksBucket.update({vm.host.id:[vm.tasksAllocated[i]]})
+
+                hostDict.update({vm.host.id:vm.host})
+        
+        for hostID,tasksList in hostTasksBucket.iteritems():
+            tasksList_d = hostTasksBucket.get(hostID)
+            tasksList_d.sort(key = lambda x: x.currentCompletionTime)
+            hostTasksBucket.update({hostID:tasksList_d})
+        #new changes
+        totalEnergyConsumed = 0
+        energyConsumed = [] 
+        for hostID,tasksList in hostTasksBucket.iteritems():
+            numberOftasks = len(tasksList)
+            energyConsumedByHost = []
+            flag = True
+            timeSlice = 0.0
+            for i in range(numberOftasks):
+                if(flag == True):
+                    utilizationMips = tasksList[i].MI
+                if((i+1 < numberOftasks) and tasksList[i].currentCompletionTime == tasksList[i+1].currentCompletionTime):
+                    utilizationMips = utilizationMips + tasksList[i+1].MI
+                    flag =False
+                else:
+                    EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    energyConsumedByHost.append(EnergyConsumed)
+                    totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
+                    hostDict.get(hostID).utilizationMips = hostDict.get(hostID).utilizationMips - utilizationMips
+                    timeSlice = tasksList[i].currentCompletionTime
+                    flag =  True
+            energyConsumed.append(energyConsumedByHost)
+        return totalEnergyConsumed
+
     def __maxMinScheduler(self):
 
         global W_deadline
@@ -125,7 +195,7 @@ class MaxMinScheduler(CloudletScheduler):
         totalMi = 0
         totalStorage = 0
         totalRuntime = 0
-
+        
         lenMaxMinList = len(maxMinList)
         for l in range(lenMaxMinList):
             allocation = Allocation()
@@ -180,9 +250,11 @@ class MaxMinScheduler(CloudletScheduler):
         SLAViolation = (( 0 if SLAVMi < 0 else SLAVMi) / totalMi) * W_mi + ( (0 if SLAVStorage < 0 else SLAVStorage)  / totalStorage) * W_storage + ((0 if SLAVRuntime < 0 else SLAVRuntime) / totalRuntime) * W_deadline
         self.cloudlet.addSLAViolationList(SLAViolation)
             
-        for vm in self.vmList:
-            energyConsumed = vm.host.getPower()
-            self.cloudlet.energyConsumption = self.cloudlet.energyConsumption + energyConsumed
+        #for vm in self.vmList:
+        #    energyConsumed = vm.host.getPower()
+        #    self.cloudlet.energyConsumption = self.cloudlet.energyConsumption + energyConsumed
+        energyConsumed = self.__calculateEnergyConsumptionOfSchedule(allocationList)
+        self.cloudlet.energyConsumption = self.cloudlet.energyConsumption + energyConsumed 
 
         if(noOfTasks == self.DAG_matrix.DAGRows):
 
