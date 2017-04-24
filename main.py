@@ -30,6 +30,7 @@ from power.PowerModelOur import PowerModelOur
 
 dataCentre = DataCentre(1)
 powerModelOur = PowerModelOur()
+#numberOfHosts,maxStorage(GB --> KB),maxMipsPerPe*1000,maxPesPerHost,powerModel
 dataCentre.setUpDatacentre(10, 10, 20, 5,powerModelOur) 
 randomGenerator = RandomWorkFlowGenerator(10,5,1,10,1,10,1000,10000,'RandomWorkFlow')
 workflow = randomGenerator.randomWorkFlowGenerator()

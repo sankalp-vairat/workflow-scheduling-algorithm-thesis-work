@@ -40,6 +40,9 @@ W_deadline = 0.4
 global noOfTasks
 noOfTasks = 0
 
+global total_time
+total_time = 0
+
 class MyopicScheduler(CloudletScheduler):
 
     def __init__(self):
@@ -112,6 +115,29 @@ class MyopicScheduler(CloudletScheduler):
             self.__synchronizedQueue(1,0)
             time.sleep(5)
         #threading.current_thread().__stop()
+
+    def __makespanCalculations(self,ant_allocation_list):
+        self.__resetVMs()
+        self.__resetHosts()    
+
+        total_length = len(ant_allocation_list)
+
+        VM_list_a={}
+        for i in range(0,total_length):
+            if(VM_list_a.has_key(ant_allocation_list[i].assignedVMGlobalId)):
+                VM_list_a[ant_allocation_list[i].assignedVMGlobalId] = VM_list_a.get(ant_allocation_list[i].assignedVMGlobalId) + self.workflow.taskDict.get(ant_allocation_list[i].taskID).MI
+            else:
+                VM_list_a[ant_allocation_list[i].assignedVMGlobalId] = self.workflow.taskDict.get(ant_allocation_list[i].taskID).MI
+            
+        time_temp = 0   
+            
+        for k,v in VM_list_a.items():
+            try:
+                time_temp = time_temp + v / self.vmList[k].getMips()
+            except ZeroDivisionError:
+                time_temp = sys.float_info.max
+
+        return time_temp
 
 
     def __calculateEnergyConsumptionOfSchedule(self,ant_allocation_list):
@@ -195,7 +221,8 @@ class MyopicScheduler(CloudletScheduler):
         global W_mi
         global W_storage
         global noOfTasks
-
+        global total_time
+        
         while(global_queue.qsize() != 0):
             myopicList.append(global_queue.get())
 
@@ -252,7 +279,8 @@ class MyopicScheduler(CloudletScheduler):
 
         energyConsumed = self.__calculateEnergyConsumptionOfSchedule(allocationList)
         self.cloudlet.energyConsumption = self.cloudlet.energyConsumption + energyConsumed 
-        
+        total_time = total_time + self.__makespanCalculations(allocationList)
+                
         # Clearing the dependencies----------------------------------------------------------------------------------------------------------
         for i in range(len(myopicList)):
             for j in range(self.DAG_matrix.DAGRows):
@@ -282,6 +310,8 @@ class MyopicScheduler(CloudletScheduler):
             self.cloudlet.finishTime = time.asctime()
 
             print "Execution finish time::",self.cloudlet.finishTime
+            
+            print "Makespan::",total_time            
 
         else:
             if(global_queue.qsize() != 0):
