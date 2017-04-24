@@ -381,13 +381,13 @@ class AntColonyScheduler(CloudletScheduler):
         cloudletSchedulerUtil.normalize(lambda_deadline_list)
            
         eta_task_list=[]
-        W_MI = 0.2                                          # weightage for MI
-        W_storage = 0.1                                     # weightage for storage
+        W_MI = 0.4                                          # weightage for MI
+        W_storage = 0.2                                     # weightage for storage
         W_deadline = 0.4                                    # weightage for deadline
             
         for i in range(temp_len):    
             eta_task_list.append (  (lambda_Mi_list[i] * W_MI  +  lambda_storage_list[i] * W_storage  +  lambda_deadline_list[i] * W_deadline ))
-            
+        '''    
         max_eta = eta_task_list[0]
         min_eta = eta_task_list[0]
             
@@ -404,7 +404,7 @@ class AntColonyScheduler(CloudletScheduler):
                     eta_task_list[i]=0.1
             except ZeroDivisionError:
                 eta_task_list[i] = 1
-
+        '''
         #Heuristic information calculation--------------------------------------------------------------------------------------------
                     
         alpha_pheromone = 0.3                 # weightage for the pheromone
@@ -459,7 +459,7 @@ class AntColonyScheduler(CloudletScheduler):
 
 
 
-    def __partialEnergyConsumption(self,vm,task):
+    def __partialEnergyConsumption(self,VM,task):
         '''
         Function:    calculates the partial energy consumption of schedule   
         Input:       
@@ -467,16 +467,23 @@ class AntColonyScheduler(CloudletScheduler):
 
         '''
         
-        host = vm.host
+        host = VM.host
         totalUtilizationMips = 0
         tasksList = []
         for vm in host.VMList:
             numberOfTasksAssigned = len(vm.tasksAllocated)
             for i in range(numberOfTasksAssigned):
                 totalUtilizationMips = totalUtilizationMips + vm.tasksAllocated[i].MI
+                time_taken = vm.tasksAllocated[i].MI / vm.currentAvailableMips
+                vm.tasksAllocated[i].currentCompletionTime = time_taken
+                vm.currentAvailableMips = vm.currentAvailableMips - vm.tasksAllocated[i].MI
+                vm.currentAvailableMips = vm.currentAllocatedMips + vm.tasksAllocated[i].MI                 
                 tasksList.append(vm.tasksAllocated[i])
 
         totalUtilizationMips = task.MI
+        time_taken = task.MI / VM.currentAvailableMips
+        task.currentCompletionTime = time_taken
+        
         tasksList.append(task)
         numberOftasks = len(tasksList)
         energyConsumed = []
@@ -518,29 +525,33 @@ class AntColonyScheduler(CloudletScheduler):
         for i in range(temp_len):
             taskID = int(ant_allocation_list[i].taskID.split('_')[1])
             vmID = int(ant_allocation_list[i].assignedVMGlobalId)
-            self.vmList[vmID].addTask(self.workflow.taskDict.get(taskID))
-            vmDict.update(vmID,self.vmList[vmID])
+            self.vmList[vmID].addTask(self.workflow.taskDict.get(str(taskID)))
+            vmDict.update({vmID:self.vmList[vmID]})
 
         hostTasksBucket = {}
         hostDict = {}
-        for vmID,vm in vmDict:
+        for vmID,vm in vmDict.iteritems():
             numberOfTasksAssigned = len(vm.tasksAllocated)
             for i in range(numberOfTasksAssigned):
                 vm.host.utilizationMips = vm.host.utilizationMips + vm.tasksAllocated[i].MI
-
+                time_taken = vm.tasksAllocated[i].MI / vm.currentAvailableMips
+                vm.tasksAllocated[i].currentCompletionTime = time_taken 
+                vm.currentAvailableMips = vm.currentAvailableMips - vm.tasksAllocated[i].MI
+                vm.currentAvailableMips = vm.currentAllocatedMips + vm.tasksAllocated[i].MI
                 if(hostTasksBucket.has_key(vm.host.id)):
-                    hostTasksBucket.update(vm.host.id,hostTasksBucket.get(vm.host.id).append(vm.tasksAllocated[i]))
+                    hostTasksBucket.update({vm.host.id:hostTasksBucket.get(vm.host.id).append(vm.tasksAllocated[i])})
                 else:
-                    hostTasksBucket.update(vm.host.id,[vm.tasksAllocated[i]])
+                    hostTasksBucket.update({vm.host.id:[vm.tasksAllocated[i]]})
 
-                hostDict.update(vm.host.id,vm.host)
+                hostDict.update({vm.host.id:vm.host})
         
-        for hostID,tasksList in hostTasksBucket:
-            hostTasksBucket.update(hostID,tasksList.sort(key = lambda x: x.currentCompletionTime))
+        for hostID,tasksList in hostTasksBucket.iteritems():
+            tasksList.sort(key = lambda x: x.currentCompletionTime)
+            hostTasksBucket.update({hostID:tasksList})
         #new changes
         totalEnergyConsumed = 0
         energyConsumed = [] 
-        for hostID,tasksList in hostTasksBucket:
+        for hostID,tasksList in hostTasksBucket.iteritems():
             numberOftasks = len(tasksList)
             energyConsumedByHost = []
             flag = True
@@ -691,7 +702,7 @@ class AntColonyScheduler(CloudletScheduler):
                         eta_list.append( ( MI_violation_list[i] * W_MI  +  storage_violation_list[i] * W_storage  +  deadline_violation_list[i] * W_deadline + energy_consumption_list[i] * W_energy) )
                                     
                     #Normalize eta values---------------------------------------------------------------------------------------------------------
-
+                    '''
                     #normalize(eta_list)
                     max_eta = eta_list[0]
                     min_eta = eta_list[0]
@@ -710,7 +721,7 @@ class AntColonyScheduler(CloudletScheduler):
                         except ZeroDivisionError:
                             eta_list[i] = 1
                     #-----------------------------------------------------------------------------------------------------------------------------
-
+                    '''
                     #Heuristic information calculation--------------------------------------------------------------------------------------------
 
                     alpha_pheromone = 0.3                 # weightage for the pheromone
