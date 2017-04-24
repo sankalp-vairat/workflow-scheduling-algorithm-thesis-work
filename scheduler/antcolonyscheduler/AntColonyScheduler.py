@@ -474,14 +474,20 @@ class AntColonyScheduler(CloudletScheduler):
             numberOfTasksAssigned = len(vm.tasksAllocated)
             for i in range(numberOfTasksAssigned):
                 totalUtilizationMips = totalUtilizationMips + vm.tasksAllocated[i].MI
-                time_taken = vm.tasksAllocated[i].MI / vm.currentAvailableMips
+                try:
+                    time_taken = vm.tasksAllocated[i].MI / vm.currentAvailableMips
+                except ZeroDivisionError:
+                    time_taken = sys.float_info.max
                 vm.tasksAllocated[i].currentCompletionTime = time_taken
                 vm.currentAvailableMips = vm.currentAvailableMips - vm.tasksAllocated[i].MI
                 vm.currentAvailableMips = vm.currentAllocatedMips + vm.tasksAllocated[i].MI                 
                 tasksList.append(vm.tasksAllocated[i])
 
         totalUtilizationMips = task.MI
-        time_taken = task.MI / VM.currentAvailableMips
+        try:
+            time_taken = task.MI / VM.currentAvailableMips
+        except ZeroDivisionError:
+            time_taken = sys.float_info.max
         task.currentCompletionTime = time_taken
         
         tasksList.append(task)
@@ -534,7 +540,10 @@ class AntColonyScheduler(CloudletScheduler):
             numberOfTasksAssigned = len(vm.tasksAllocated)
             for i in range(numberOfTasksAssigned):
                 vm.host.utilizationMips = vm.host.utilizationMips + vm.tasksAllocated[i].MI
-                time_taken = vm.tasksAllocated[i].MI / vm.currentAvailableMips
+                try:
+                    time_taken = vm.tasksAllocated[i].MI / vm.currentAvailableMips
+                except ZeroDivisionError:
+                    time_taken = sys.float_info.max
                 vm.tasksAllocated[i].currentCompletionTime = time_taken 
                 vm.currentAvailableMips = vm.currentAvailableMips - vm.tasksAllocated[i].MI
                 vm.currentAvailableMips = vm.currentAllocatedMips + vm.tasksAllocated[i].MI
@@ -546,8 +555,9 @@ class AntColonyScheduler(CloudletScheduler):
                 hostDict.update({vm.host.id:vm.host})
         
         for hostID,tasksList in hostTasksBucket.iteritems():
-            tasksList.sort(key = lambda x: x.currentCompletionTime)
-            hostTasksBucket.update({hostID:tasksList})
+            tasksList_d = hostTasksBucket.get(hostID)
+            tasksList_d.sort(key = lambda x: x.currentCompletionTime)
+            hostTasksBucket.update({hostID:tasksList_d})
         #new changes
         totalEnergyConsumed = 0
         energyConsumed = [] 
@@ -613,7 +623,7 @@ class AntColonyScheduler(CloudletScheduler):
         global total_time
         global no_Of_Ants
         global iterations
-
+        global noOfTasks
         self.__initializePheromone();
 
         global total_time
@@ -1067,6 +1077,7 @@ class AntColonyScheduler(CloudletScheduler):
         '''
         global global_queue
         global rlock
+        global noOfTasks
 
         rlock.acquire()
         try:
