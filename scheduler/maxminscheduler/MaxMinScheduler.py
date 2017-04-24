@@ -59,11 +59,14 @@ class MaxMinScheduler(CloudletScheduler):
         rootTasksIndexes = cloudletSchedulerUtil.findRootTasks(self.DAG_matrix)
 
         for rootTaskIndex in rootTasksIndexes:
-            self.__synchronizedQueue(2,rootTaskIndex)
+            #self.__synchronizedQueue(2,rootTaskIndex)
+            global_queue.put(rootTaskIndex)
             
-        starting_thread = Thread(target = self.__maxMinSchedulerUtil(), args = ())
+        #starting_thread = Thread(target = self.__maxMinSchedulerUtil(), args = ())
         #starting_thread.daemon = True
-        starting_thread.start()
+        #starting_thread.start()
+        
+        self.__maxMinScheduler()
 
     def __synchronizedQueue(self,choice,pos):
         '''
@@ -105,7 +108,6 @@ class MaxMinScheduler(CloudletScheduler):
 
     def __maxMinSchedulerUtil(self):
         while(noOfTasks < self.DAG_matrix.DAGRows):
-            print "hello"
             self.__synchronizedQueue(1,0)
             time.sleep(5)
         #threading.current_thread().__stop()
@@ -181,12 +183,17 @@ class MaxMinScheduler(CloudletScheduler):
         return totalEnergyConsumed
 
     def __maxMinScheduler(self):
+        self.__resetVMs()
+        self.__resetHosts()
 
         global W_deadline
         global W_mi
         global W_storage
         global noOfTasks
-            
+        
+        while(global_queue.qsize() != 0):
+            maxMinList.append(global_queue.get())
+
         allocationList = []
         SLAVMi = 0
         SLAVStorage = 0
@@ -243,7 +250,8 @@ class MaxMinScheduler(CloudletScheduler):
                 if(self.DAG_matrix.DAG[j][int(allocation.taskId)] == 1):
                     self.DAG_matrix.dependencyMatrix[j] = self.DAG_matrix.dependencyMatrix[j] - 1
                     if(self.DAG_matrix.dependencyMatrix[j] == 0):
-                        self.__synchronizedQueue(2, j)
+                        #self.__synchronizedQueue(2, j)
+                        global_queue.put(j)
 
             noOfTasks = noOfTasks + 1
             
@@ -274,3 +282,7 @@ class MaxMinScheduler(CloudletScheduler):
             self.cloudlet.finishTime = time.asctime()
 
             print "Execution finish time::",self.cloudlet.finishTime
+        
+        else:
+            if(global_queue.qsize() != 0):
+                self.__maxMinScheduler()
