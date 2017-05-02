@@ -15,7 +15,7 @@ class CloudletSchedulerUtil:
         Output:    List of tasks that are starting point of DAG
 
         '''
-        print "finding starting tasks in dependency graph......."
+        #print "finding starting tasks in dependency graph......."
 
         starting_vertices=[];
         for row in range(DAG_Matrix.DAGRows):
@@ -75,7 +75,7 @@ class CloudletSchedulerUtil:
         (SIDE)EFFECTS: 
         
         '''
-        f= open("Output.txt","a+")
+        f= open("Results_Montage_nodes.txt","a+")
         f.write(str)
         f.write("\n")
         f.close()

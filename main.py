@@ -24,23 +24,60 @@ import time
 import threading
 from scheduler.antcolonyscheduler.AntColonyScheduler import AntColonyScheduler
 from power.PowerModelOur import PowerModelOur
-#syntheticGenerator =SyntheticGenerator('CyberShake_30.xml')
+from scheduler.CloudletSchedulerUtil import CloudletSchedulerUtil
 
+#syntheticGenerator =SyntheticGenerator('CyberShake_30.xml')
 #syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
 
+
+cloudletSchedulerUtil =CloudletSchedulerUtil()
 dataCentre = DataCentre(1)
 powerModelOur = PowerModelOur()
 #numberOfHosts,maxStorage(GB --> KB),maxMipsPerPe*1000,maxPesPerHost,powerModel
-dataCentre.setUpDatacentre(10, 10, 20, 5,powerModelOur) 
-randomGenerator = RandomWorkFlowGenerator(10,5,1,10,1,10,1000,10000,'RandomWorkFlow')
-workflow = randomGenerator.randomWorkFlowGenerator()
+dataCentre.setUpDatacentre(10,200,20, 8,powerModelOur)
+#noOfTasks, noOfLevels, runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperBound, type 
+#randomGenerator = RandomWorkFlowGenerator(2000,100,1,10,1,10,1000,10000,'RandomForkJoinWorkFlow')
+#workflow = randomGenerator.randomWorkFlowGenerator()
+syntheticGenerator =SyntheticGenerator('Montage_1000.xml')
+workflow = syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
+
 workflow.createTaskDictionary()
-#myopic = MyopicScheduler()
-#minMin = MinMinScheduler()
+myopic = MyopicScheduler()
+minMin = MinMinScheduler()
 maxMin = MaxMinScheduler()
 antColonyScheduler = AntColonyScheduler()
+
+cloudletSchedulerUtil.printf("Montage:"+str(1000))
+cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
+cloudletSchedulerUtil.printf("MinMin Started");
+cloudletScheduler = CloudletScheduler(minMin)
+cloudlet = Cloudlet(cloudletId = 1,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow)
+cloudletScheduler.executeScheduler(cloudlet,dataCentre)
+print "MinMin ended"
+cloudletSchedulerUtil.printf("MinMin ended");
+cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
+#------------------------------------------------------------------------------------------------------------------------------
+cloudletSchedulerUtil.printf("max Started");
 cloudletScheduler = CloudletScheduler(maxMin)
 cloudlet = Cloudlet(cloudletId = 1,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow)
 cloudletScheduler.executeScheduler(cloudlet,dataCentre)
+print "MaxMin ended"
+cloudletSchedulerUtil.printf("MaxMin ended");
+cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
+#-------------------------------------------------------------------------------------------------------------------------------
+cloudletSchedulerUtil.printf("Myopic Started");
+cloudletScheduler = CloudletScheduler(myopic)
+cloudlet = Cloudlet(cloudletId = 1,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow)
+cloudletScheduler.executeScheduler(cloudlet,dataCentre)
+cloudletSchedulerUtil.printf("Myopic ended");
 print "Myopic ended"
-print threading.active_count()
+cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
+#------------------------------------------------------------------------------------------------------------------------------
+cloudletSchedulerUtil.printf("ACO Started");
+cloudletScheduler = CloudletScheduler(antColonyScheduler)
+cloudlet = Cloudlet(cloudletId = 1,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow)
+cloudletScheduler.executeScheduler(cloudlet,dataCentre)
+print "ACO ended"
+cloudletSchedulerUtil.printf("ACO ended");
+cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
+#--------------------------------------------------------------------------------------------------------------------------------

@@ -20,7 +20,7 @@ TB = 1024*GB
 SECONDS = 1
 MINUTES = 60*SECONDS
 HOURS = 60*MINUTES
-
+import random
 
 class SyntheticGenerator():
     def __init__(self,fileName):
@@ -32,31 +32,32 @@ class SyntheticGenerator():
 
         workFlow = WorkFlow(name=workFlowName, description="""Synthetic DataSet"""+workFlowName)
         
-        tree = ET.parse('CyberShake_30.xml')
+        tree = ET.parse(self.fileName)
         root = tree.getroot()
         dictionaryOfTasks =  {}
         for job in root.findall('{http://pegasus.isi.edu/schema/DAX}job'):
             files = job.findall('{http://pegasus.isi.edu/schema/DAX}uses')
-            task = Task(id="task_%s"% job.get('id'), namespace=job.get('namespace'), name=job.get('name'), runtime=job.get('runtime')*SECONDS, MI=UniformDistribution(miLowerBound, miUpperBound))
+            mi = random.uniform(miLowerBound, miUpperBound)
+            task = Task(id="task_%s"% int(job.get('id')[2:]), namespace=job.get('namespace'), name=job.get('name'), runtime=float(job.get('runtime'))*SECONDS, MI=mi)
             size = 0
             for file in files:
                 #if(file.get('link') == 'input'):
                     #t.addInput(File(file.get('file'),size = file.get('size')))
                 if(file.get('link') == 'output'):
                     size = size + int(file.get('size'))
-                    tout = File("task_%s_out.dat"% job.get('id'), size = file.get('size'))
+                    tout = File("task_%d_out.dat"% int(job.get('id')[2:]), size = int(file.get('size')))
                     task.addOutput(tout)
                     
-            task.storage = file.get('size')
-            dictionaryOfTasks.update({job.get('id'):task})
+            task.storage = float(file.get('size'))
+            dictionaryOfTasks.update({int(job.get('id')[2:]):task})
             
                 
         for child in root.findall('{http://pegasus.isi.edu/schema/DAX}child'):
             parents =  child.findall('{http://pegasus.isi.edu/schema/DAX}parent')
-            if(dictionaryOfTasks.has_key(child.get('ref'))):
-                task =  dictionaryOfTasks.get(child.get('ref'))
+            if(dictionaryOfTasks.has_key(int(child.get('ref')[2:]))):
+                task =  dictionaryOfTasks.get(int(child.get('ref')[2:]))
                 for parent in parents:
-                    task.addInput(File("task_%s_out.dat"% parent.get('ref'), size = None ))
+                    task.addInput(File("task_%d_out.dat"% int(parent.get('ref')[2:]), size = None ))
                     
         for taskName, task in dictionaryOfTasks.iteritems():
             workFlow.addJob(task)

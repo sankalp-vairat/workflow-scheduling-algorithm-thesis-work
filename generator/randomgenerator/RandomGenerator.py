@@ -77,7 +77,7 @@ class RandomGenerator():
 
             size = host.storage
             for  vm in VMList:
-                  vm.storage = int(size / noOfVMsPerHost)
+                vm.storage = int(size / noOfVMsPerHost)
             for j in range(size % noOfVMsPerHost):
                 VMList[j].storage += 1
             

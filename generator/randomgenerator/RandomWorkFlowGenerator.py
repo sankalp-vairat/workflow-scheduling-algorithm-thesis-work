@@ -214,9 +214,14 @@ class RandomWorkFlowGenerator(RandomGenerator):
                 try:
                     k = random.randint(0,len(globalAvailableTasks)-1)
                 except:
-                    k = 1
-                
-                parent = globalAvailableTasks[k]
+                    k = 0
+                try:
+                    parent = globalAvailableTasks[k]
+                except Exception:
+                    #print k
+                    #print globalAvailableTasks
+                    #print len(globalAvailableTasks)
+                    continue
                 
                 del globalAvailableTasks[k]
                 
