@@ -30,7 +30,8 @@ class RandomGenerator():
         for i in range(numberOfHosts):
             host = PowerHost(id =  i,powerModel = powerModel) 
             #host.setId(i)
-            host.setStorage(randint(1,maxStorage))
+            #make the GB to KB
+            host.setStorage(randint(1,maxStorage*1024))
             #host.setpeList(None)
             #host.setVMList(None)
             hostList.append(host)
@@ -76,7 +77,7 @@ class RandomGenerator():
 
             size = host.storage
             for  vm in VMList:
-                  vm.storage = int(size / noOfVMsPerHost)
+                vm.storage = int(size / noOfVMsPerHost)
             for j in range(size % noOfVMsPerHost):
                 VMList[j].storage += 1
             

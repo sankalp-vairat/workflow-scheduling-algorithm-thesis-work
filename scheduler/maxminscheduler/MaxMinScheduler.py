@@ -28,16 +28,22 @@ global maxMinList
 maxMinList = []
 
 global W_mi
-W_mi = 0.2
+W_mi = 0.3
 
 global W_storage
-W_storage = 0.4
+W_storage = 0.3
 
 global W_deadline
 W_deadline = 0.4
 
+global W_energy
+W_energy = 0.5
+
 global noOfTasks
 noOfTasks = 0
+
+global total_time
+total_time = 0
 
 class MaxMinScheduler(CloudletScheduler):
 
@@ -111,6 +117,30 @@ class MaxMinScheduler(CloudletScheduler):
             self.__synchronizedQueue(1,0)
             time.sleep(5)
         #threading.current_thread().__stop()
+
+    def __makespanCalculations(self,ant_allocation_list):
+        self.__resetVMs()
+        self.__resetHosts()    
+
+        total_length = len(ant_allocation_list)
+
+        VM_list_a={}
+        for i in range(0,total_length):
+            if(VM_list_a.has_key(ant_allocation_list[i].assignedVMGlobalId)):
+                VM_list_a[ant_allocation_list[i].assignedVMGlobalId] = VM_list_a.get(ant_allocation_list[i].assignedVMGlobalId) + self.workflow.taskDict.get(str(ant_allocation_list[i].taskID)).MI
+            else:
+                VM_list_a[ant_allocation_list[i].assignedVMGlobalId] = self.workflow.taskDict.get(str(ant_allocation_list[i].taskID)).MI
+            
+        time_temp = 0   
+            
+        for k,v in VM_list_a.items():
+            try:
+                time_temp = time_temp + v / self.vmList[k].getMips()
+            except ZeroDivisionError:
+                time_temp = sys.float_info.max
+
+        return time_temp
+
 
     def __calculateEnergyConsumptionOfSchedule(self,ant_allocation_list):
         '''
@@ -190,6 +220,7 @@ class MaxMinScheduler(CloudletScheduler):
         global W_mi
         global W_storage
         global noOfTasks
+        global total_time
         
         while(global_queue.qsize() != 0):
             maxMinList.append(global_queue.get())
@@ -232,7 +263,7 @@ class MaxMinScheduler(CloudletScheduler):
 
             #SLA violation calculation
             SLAVMi = SLAVMi + (self.workflow.taskDict.get(allocation.taskId).MI - self.vmList[vmIndex].currentAvailableMips)
-            SLAVStorage = SLAVStorage + (self.workflow.taskDict.get(allocation.taskId).storage - self.vmList[vmIndex].currentAvailableStorage)
+            SLAVStorage = SLAVStorage + 0 if(self.workflow.taskDict.get(allocation.taskId).storage - self.vmList[vmIndex].currentAvailableStorage)<0 else (self.workflow.taskDict.get(allocation.taskId).storage - self.vmList[vmIndex].currentAvailableStorage)
             SLAVRuntime = SLAVRuntime + maximumExecTime 
 
             totalMi = totalMi + self.workflow.taskDict.get(allocation.taskId).MI
@@ -254,6 +285,9 @@ class MaxMinScheduler(CloudletScheduler):
                         global_queue.put(j)
 
             noOfTasks = noOfTasks + 1
+
+        energyConsumed = self.__calculateEnergyConsumptionOfSchedule(allocationList)
+        self.cloudlet.energyConsumption = self.cloudlet.energyConsumption + energyConsumed
             
         SLAViolation = (( 0 if SLAVMi < 0 else SLAVMi) / totalMi) * W_mi + ( (0 if SLAVStorage < 0 else SLAVStorage)  / totalStorage) * W_storage + ((0 if SLAVRuntime < 0 else SLAVRuntime) / totalRuntime) * W_deadline
         self.cloudlet.addSLAViolationList(SLAViolation)
@@ -261,12 +295,12 @@ class MaxMinScheduler(CloudletScheduler):
         #for vm in self.vmList:
         #    energyConsumed = vm.host.getPower()
         #    self.cloudlet.energyConsumption = self.cloudlet.energyConsumption + energyConsumed
-        energyConsumed = self.__calculateEnergyConsumptionOfSchedule(allocationList)
-        self.cloudlet.energyConsumption = self.cloudlet.energyConsumption + energyConsumed 
+        total_time = total_time + self.__makespanCalculations(allocationList) 
 
         if(noOfTasks == self.DAG_matrix.DAGRows):
 
             print "Total Energy Consumed is ::",self.cloudlet.energyConsumption
+            cloudletSchedulerUtil.printf( "Total Energy Consumed is ::"+str(self.cloudlet.energyConsumption))
 
             sumSLAViolation = 0
 
@@ -276,12 +310,22 @@ class MaxMinScheduler(CloudletScheduler):
             averageSLAViolation = sumSLAViolation / len(self.cloudlet.SLAViolationList) 
 
             print "Average SLA Violation is ::",averageSLAViolation
+            
+            cloudletSchedulerUtil.printf("Average SLA Violation is ::"+str(averageSLAViolation))
 
             print "Execution Start Time::",self.cloudlet.execStartTime
+            
+            cloudletSchedulerUtil.printf("Execution Start Time::"+str(self.cloudlet.execStartTime))
 
             self.cloudlet.finishTime = time.asctime()
 
             print "Execution finish time::",self.cloudlet.finishTime
+            
+            cloudletSchedulerUtil.printf("Execution finish time::"+str(self.cloudlet.finishTime))
+
+            print "Makespan::",total_time
+            
+            cloudletSchedulerUtil.printf("Makespan::"+str(total_time))
         
         else:
             if(global_queue.qsize() != 0):

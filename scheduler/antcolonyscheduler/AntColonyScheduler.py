@@ -50,10 +50,10 @@ global noOfTasks
 noOfTasks = 0
 
 global no_Of_Ants
-no_Of_Ants = 2
+no_Of_Ants = 10
 
 global iterations
-iterations = 2
+iterations = 10
 
 global pheromone_task_level
 pheromone_task_level = []
@@ -111,7 +111,7 @@ class AntColonyScheduler(CloudletScheduler):
         Output:      none
         
         '''
-        print "Initializing parameters......."
+        #print "Initializing parameters......."
         
         global DAG_row
         global DAG_column
@@ -137,7 +137,7 @@ class AntColonyScheduler(CloudletScheduler):
         Output:    none
 
         '''
-        print "Initializing trails with pheromone :"
+        #print "Initializing trails with pheromone :"
         global pheromone_task_level
         global pheromone_VM_level
         global p_row_task
@@ -167,7 +167,7 @@ class AntColonyScheduler(CloudletScheduler):
 
         '''
         
-        print "Performing pheromone evaporation task level.............."
+        #print "Performing pheromone evaporation task level.............."
         
         for i in range(p_row_task):
             for j in range(p_column_task):
@@ -182,7 +182,7 @@ class AntColonyScheduler(CloudletScheduler):
         (SIDE)EFFECTS: pheromones are reduced by factor rho
 
         '''
-        print "evaporating pheromone on VM level.............."
+        #print "evaporating pheromone on VM level.............."
         global p_row_task
         global p_column_task
         
@@ -199,7 +199,7 @@ class AntColonyScheduler(CloudletScheduler):
         (SIDE)EFFECTS: pheromone value is updated on the edge (i,j)
         
         '''         
-        print "performing local pheromone update at task level................."
+        #print "performing local pheromone update at task level................."
         
         phi=0.2                                                                         #decay coefficient
         pheromone_task_level[i]=(1-phi)*pheromone_task_level[i]+phi*tau_0_task
@@ -214,7 +214,7 @@ class AntColonyScheduler(CloudletScheduler):
         
         '''
         
-        print "performing local pheromone update at VM level................."
+        #print "performing local pheromone update at VM level................."
                      
         phi=0.2                                                                         #decay coefficient
         pheromone_VM_level[i][j]=(1-phi)*pheromone_VM_level[i][j]+phi*tau_0_VM
@@ -228,7 +228,7 @@ class AntColonyScheduler(CloudletScheduler):
         (SIDE)EFFECTS: pheromone value is updated on the edges (i,j) which are part of ant k's solution
         
         '''
-        print "performing global pheromone update at task level................."
+        #print "performing global pheromone update at task level................."
         
         #min_SLAV_delta_tau = min(SLAV_delta_tau_global_list)
         #index = SLAV_delta_tau_global_list.index(min_SLAV_delta_tau)
@@ -242,7 +242,7 @@ class AntColonyScheduler(CloudletScheduler):
         pheromone_task_level[task] = (1 - rho_task) * pheromone_task_level[task] + rho_task * (1 - minDeltaTau**gamma)
         
         for i in range(1,temp_len):
-            gamma=gamma+0.1
+            gamma=gamma + 0.1
             task = int(ant_allocation_list[i].taskID.split('_')[1])
             #VM = ant_allocation_list[i].assigned_VM
             pheromone_task_level[task] = (1 - rho_task) * pheromone_task_level[task] + rho_task * (1 - minDeltaTau**gamma)
@@ -257,7 +257,7 @@ class AntColonyScheduler(CloudletScheduler):
         
         '''    
 
-        print "performing global pheromone update at VM level................."
+        #print "performing global pheromone update at VM level................."
         
         #length = len(SLAV_delta_tau_global_list)
         
@@ -317,7 +317,7 @@ class AntColonyScheduler(CloudletScheduler):
 
         '''
         
-        print "Selecting task......................................"    
+        #print "Selecting task......................................"    
         
         temp_len = len(temp_ACO_list)
         temp_MI_list = []
@@ -574,14 +574,16 @@ class AntColonyScheduler(CloudletScheduler):
         cloudletSchedulerUtil.normalize(energy_list)
         
         deltaTauList = []
+        deltaTauList_shadow = []
         length =len(miList)
         for i in range(length):
             deltaTau = miList[i]*W_mi + storageList[i]*W_storage +deadlineList[i]*W_deadline + energy_list[i]*W_energy
             deltaTauList.append(deltaTau)
+            deltaTauList_shadow.append(miList[i]*0.3 + storageList[i]*0.3 +deadlineList[i]*0.4)
             
         index = deltaTauList.index(min(deltaTauList))
         
-        return index,min(deltaTauList)
+        return index,min(deltaTauList),deltaTauList_shadow[index]
         
 
     def __resetVMs(self):
@@ -602,8 +604,8 @@ class AntColonyScheduler(CloudletScheduler):
 
         '''
 
-        print "Executing ACO"
-        print "ACO_LIST",ACO_list
+        #print "Executing ACO"
+        #print "ACO_LIST",ACO_list
 
         global total_time
         global no_Of_Ants
@@ -736,8 +738,8 @@ class AntColonyScheduler(CloudletScheduler):
                     # Calculations for Global pheromone update---------------------------------------------------------------------------------
                     SLA_MI_global = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).MI - self.vmList[largest_probability_index].currentAvailableMips)
 
-                    if(SLA_MI_global < 0):
-                        SLA_MI_global=0
+                    #if(SLA_MI_global < 0):
+                    #    SLA_MI_global=0
                     
                     SLA_storage_global = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).storage - self.vmList[largest_probability_index].currentAvailableStorage)
                     
@@ -820,22 +822,22 @@ class AntColonyScheduler(CloudletScheduler):
                     #self.calculateDeltaTau(SLAV_MI_tau_global_list, SLAV_storage_tau_global_list, SLAV_deadline_tau_global_list)
                     #SLAV_delta_tau_global_list.append(delta_tau_SLAV)
                     #cloudletSchedulerUtil.printf("delta_tau_SLAV"+"\t"+str(delta_tau_SLAV))
-                    cloudletSchedulerUtil.printf("----------------------------------------------")
+                    ##cloudletSchedulerUtil.printf("----------------------------------------------")
                     #performing evaporation on VM-task graph------------------------------------------------------------------------------------
                     self.__evaporationVMLevel()
                     
                     ants_allocation_list.append(ant_allocation_list)
                     
                     #printing ant allocation list
-                    cloudletSchedulerUtil.print_allocations(ant_allocation_list,it,nA)
+                    ##cloudletSchedulerUtil.print_allocations(ant_allocation_list,it,nA)
 
             #performing global pheromone update---------------------------------------------------------------------------------------------
             
             if(len(SLAV_MI_tau_global_list) > 0):
-                indexMin,minDeltaTau = self.__calculateDeltaTau(SLAV_MI_tau_global_list, SLAV_storage_tau_global_list, SLAV_deadline_tau_global_list,energy_list)
+                indexMin,minDeltaTau,minDeltaTau_shadow = self.__calculateDeltaTau(SLAV_MI_tau_global_list, SLAV_storage_tau_global_list, SLAV_deadline_tau_global_list,energy_list)
                 ant_allocation_list = self.__globalUpdatePheromoneVMLevel(indexMin,minDeltaTau,ants_allocation_list)
                 self.__globalUpdatePheromoneTaskLevel(indexMin,minDeltaTau,ants_allocation_list)
-                SLAV_delta_tau_global_lists.append(minDeltaTau)
+                SLAV_delta_tau_global_lists.append(minDeltaTau_shadow)
                 iterations_allocation_list.append(ant_allocation_list)
 
         if(len(SLAV_delta_tau_global_lists)>0):
@@ -866,10 +868,15 @@ class AntColonyScheduler(CloudletScheduler):
                     time_temp = sys.float_info.max
 
             total_time = total_time + time_temp
-            print "total_time:",total_time
-            cloudletSchedulerUtil.printf("total_time::"+str(total_time))
+            #print "total_time:",total_time
+            #cloudletSchedulerUtil.printf("total_time::"+str(total_time))
             self.cloudlet.SLAViolationList.append(minDeltaSLAVGlobal)
-            cloudletSchedulerUtil.printf("min_SLAV_delta_tau::"+str(minDeltaSLAVGlobal))
+
+            #cloudletSchedulerUtil.printf("min_SLAV_delta_tau::"+str(minDeltaSLAVGlobal))
+
+            #cloudletSchedulerUtil.printf("min_SLAV_delta_tau::"+str(minDeltaSLAVGlobal))
+            #min_delta_SLAV_list.append(min(SLAV_delta_tau_global_lists))
+            #print "----------------------------------------------------------------------------------------------------------"
 
             print "----------------------------------------------------------------------------------------------------------"
             
@@ -905,6 +912,7 @@ class AntColonyScheduler(CloudletScheduler):
         if(noOfTasks == self.DAG_matrix.DAGRows):
 
             print "Total Energy Consumed is ::",self.cloudlet.energyConsumption
+            cloudletSchedulerUtil.printf( "Total Energy Consumed is ::"+str(self.cloudlet.energyConsumption))
 
             sumSLAViolation = 0
 
@@ -914,12 +922,22 @@ class AntColonyScheduler(CloudletScheduler):
             averageSLAViolation = sumSLAViolation / len(self.cloudlet.SLAViolationList) 
 
             print "Average SLA Violation is ::",averageSLAViolation
+            
+            cloudletSchedulerUtil.printf("Average SLA Violation is ::"+str(averageSLAViolation))
 
             print "Execution Start Time::",self.cloudlet.execStartTime
+            
+            cloudletSchedulerUtil.printf("Execution Start Time::"+str(self.cloudlet.execStartTime))
 
             self.cloudlet.finishTime = time.asctime()
 
             print "Execution finish time::",self.cloudlet.finishTime
+            
+            cloudletSchedulerUtil.printf("Execution finish time::"+str(self.cloudlet.finishTime))
+
+            print "Makespan::",total_time
+            
+            cloudletSchedulerUtil.printf("Makespan::"+str(total_time))
 
 
     def execute(self,cloudlet,dataCentre):
@@ -973,6 +991,11 @@ class AntColonyScheduler(CloudletScheduler):
 
     def __ACOSchedulerUtil(self):
         while(noOfTasks < self.DAG_matrix.DAGRows):
-            print "hello"
+            #print "hello"
             self.__synchronizedQueue(1,0)
+<<<<<<< HEAD
             time.sleep(5)
+=======
+            time.sleep(2)
+        #threading.current_thread().__stop()
+>>>>>>> fd38b9e6934552a202fd6311c3bdb975c9567799
