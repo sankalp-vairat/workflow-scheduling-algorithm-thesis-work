@@ -993,9 +993,5 @@ class AntColonyScheduler(CloudletScheduler):
         while(noOfTasks < self.DAG_matrix.DAGRows):
             #print "hello"
             self.__synchronizedQueue(1,0)
-<<<<<<< HEAD
-            time.sleep(5)
-=======
             time.sleep(2)
         #threading.current_thread().__stop()
->>>>>>> fd38b9e6934552a202fd6311c3bdb975c9567799
