@@ -38,7 +38,7 @@ dataCentre.setUpDatacentre(10,200,20, 8,powerModelOur)
 #noOfTasks, noOfLevels, runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperBound, type 
 #randomGenerator = RandomWorkFlowGenerator(2000,100,1,10,1,10,1000,10000,'RandomForkJoinWorkFlow')
 #workflow = randomGenerator.randomWorkFlowGenerator()
-syntheticGenerator =SyntheticGenerator('Montage_1000.xml')
+syntheticGenerator =SyntheticGenerator('CyberShake_30.xml')
 workflow = syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
 
 workflow.createTaskDictionary()
@@ -47,7 +47,7 @@ minMin = MinMinScheduler()
 maxMin = MaxMinScheduler()
 antColonyScheduler = AntColonyScheduler()
 
-cloudletSchedulerUtil.printf("Montage:"+str(1000))
+cloudletSchedulerUtil.printf("Cybershake:"+str(30))
 cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
 cloudletSchedulerUtil.printf("MinMin Started");
 cloudletScheduler = CloudletScheduler(minMin)

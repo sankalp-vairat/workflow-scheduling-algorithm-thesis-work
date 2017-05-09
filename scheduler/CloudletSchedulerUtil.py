@@ -79,6 +79,19 @@ class CloudletSchedulerUtil:
         f.write(str)
         f.write("\n")
         f.close()
+        
+    def printf_intermediate(self,str):
+        '''
+        FUNCTION:      This function prints output to a file
+        INPUT:         
+        OUTPUT:        
+        (SIDE)EFFECTS: 
+        
+        '''
+        f= open("Output.txt","a+")
+        f.write(str)
+        f.write("\n")
+        f.close()
 
     def printf_1D_list(self,list_1D):
         '''
@@ -151,10 +164,11 @@ class CloudletSchedulerUtil:
         
         temp_len=len(ant_allocation_list)
         
-        self.printf("Iteration::"+str(iteration)+"\t"+"Ant::"+str(ant))
+        self.printf_intermediate("Iteration::"+str(iteration)+"\t"+"Ant::"+str(ant))
         for i in range(temp_len):
             task = ant_allocation_list[i].taskID
             VM = ant_allocation_list[i].assignedVMId
-            self.printf("Task:: "+str(task)+"\t"+"VM:: "+str(VM))
+            globalVMId = ant_allocation_list[i].assignedVMGlobalId
+            self.printf_intermediate("Task:: "+str(task)+"\t"+"VM:: "+str(VM)+"\t"+"Global VM:: "+str(globalVMId))
 
     #-------------------------------------------------------------------------------------------------------------------------------------

@@ -62,14 +62,16 @@ class RandomGenerator():
             noOfPes = host.getpelist()
             i = 0;
             vmId = 0
+            vmNo = 0
             for pe  in host.getpelist():
                 if(i < noOfVMsPerHost):
-                    vmId = str(host.id)+':' + str(vmId)
+                    vmId = str(host.id)+':' + str(vmNo)
                     vm = VM(id = vmId,host = host,globalVMId = globalVMId)
                     vm.addPeList(pe)
                     #host.addVm(vm)
                     VMList.append(vm)
                     globalVMId = globalVMId +1
+                    vmNo = vmNo + 1
                 else:
                     vmIndex = randint(0,len(VMList)-1)
                     VMList[vmIndex].addPeList(pe)  

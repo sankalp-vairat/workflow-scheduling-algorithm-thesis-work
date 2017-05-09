@@ -41,7 +41,7 @@ global W_storage
 W_storage = 0.1
 
 global W_deadline
-W_deadline = 0.2
+W_deadline = 0.5
 
 global W_energy
 W_energy = 0.5
@@ -50,10 +50,10 @@ global noOfTasks
 noOfTasks = 0
 
 global no_Of_Ants
-no_Of_Ants = 10
+no_Of_Ants = 50
 
 global iterations
-iterations = 10
+iterations = 100
 
 global pheromone_task_level
 pheromone_task_level = []
@@ -324,30 +324,30 @@ class AntColonyScheduler(CloudletScheduler):
         temp_storage_list = []
         temp_deadline_list = []
         for i in range(temp_len):
-            temp_MI_list.append(float(self.workflow.taskDict.get(str(temp_ACO_list[i])).MI))
-            temp_storage_list.append(float(self.workflow.taskDict.get(str(temp_ACO_list[i])).storage))
+            #temp_MI_list.append(float(self.workflow.taskDict.get(str(temp_ACO_list[i])).MI))
+            #temp_storage_list.append(float(self.workflow.taskDict.get(str(temp_ACO_list[i])).storage))
             temp_deadline_list.append(float(self.workflow.taskDict.get(str(temp_ACO_list[i])).runtime))
         
-        min_MI = temp_MI_list[0]
-        max_MI = temp_MI_list[0]
-        min_storage = temp_storage_list[0]
-        max_storage = temp_storage_list[0]
+        #min_MI = temp_MI_list[0]
+        #max_MI = temp_MI_list[0]
+        #min_storage = temp_storage_list[0]
+        #max_storage = temp_storage_list[0]
         min_deadline = temp_deadline_list[0]
         max_deadline = temp_deadline_list[0]
         
         for i in range(1,temp_len):
             
-            if(temp_MI_list[i] > max_MI):
-                max_MI = temp_MI_list[i]
+            #if(temp_MI_list[i] > max_MI):
+            #    max_MI = temp_MI_list[i]
             
-            if(temp_MI_list[i] < min_MI):
-                min_MI = temp_MI_list[i]
+            #if(temp_MI_list[i] < min_MI):
+            #    min_MI = temp_MI_list[i]
                 
-            if(temp_storage_list[i] > max_storage):
-                max_storage = temp_storage_list[i]
+            #if(temp_storage_list[i] > max_storage):
+            #    max_storage = temp_storage_list[i]
             
-            if(temp_storage_list[i] < min_storage):
-                min_storage = temp_storage_list[i]
+            #if(temp_storage_list[i] < min_storage):
+            #    min_storage = temp_storage_list[i]
                 
             if(temp_deadline_list[i] > max_deadline):
                 max_deadline = temp_deadline_list[i]
@@ -360,7 +360,7 @@ class AntColonyScheduler(CloudletScheduler):
         lambda_deadline_list = []
         
         for i in range(temp_len):
-            
+            '''
             try:
                 lambda_Mi_list.append((temp_MI_list[i] - min_MI) / (max_MI - min_MI ))
             except ZeroDivisionError:
@@ -370,23 +370,25 @@ class AntColonyScheduler(CloudletScheduler):
                 lambda_storage_list.append((temp_storage_list[i] - min_storage) / (max_storage - min_storage ))
             except ZeroDivisionError:
                 lambda_storage_list.append(sys.float_info.max)
-                
+            '''    
             try:
                 lambda_deadline_list.append((temp_deadline_list[i] - min_deadline) / (max_deadline - min_deadline ))
             except ZeroDivisionError:
                 lambda_deadline_list.append(sys.float_info.max)
         
-        cloudletSchedulerUtil.normalize(lambda_Mi_list)     
-        cloudletSchedulerUtil.normalize(lambda_storage_list)
+        #cloudletSchedulerUtil.normalize(lambda_Mi_list)     
+        #cloudletSchedulerUtil.normalize(lambda_storage_list)
         cloudletSchedulerUtil.normalize(lambda_deadline_list)
            
         eta_task_list=[]
         W_MI = 0.4                                          # weightage for MI
         W_storage = 0.2                                     # weightage for storage
         W_deadline = 0.4                                    # weightage for deadline
+        W_deadline = 1.0                                    # weightage for deadline
             
         for i in range(temp_len):    
-            eta_task_list.append (  (lambda_Mi_list[i] * W_MI  +  lambda_storage_list[i] * W_storage  +  lambda_deadline_list[i] * W_deadline ))
+            #eta_task_list.append (  (lambda_Mi_list[i] * W_MI  +  lambda_storage_list[i] * W_storage  +  lambda_deadline_list[i] * W_deadline ))
+            eta_task_list.append ( lambda_deadline_list[i] * W_deadline )
 
         #Heuristic information calculation--------------------------------------------------------------------------------------------
                     
@@ -568,21 +570,25 @@ class AntColonyScheduler(CloudletScheduler):
         return totalEnergyConsumed
 
     def __calculateDeltaTau(self,miList,storageList,deadlineList,energy_list):
-        cloudletSchedulerUtil.normalize(miList)
-        cloudletSchedulerUtil.normalize(storageList)
+        #cloudletSchedulerUtil.normalize(miList)
+        #cloudletSchedulerUtil.normalize(storageList)
         cloudletSchedulerUtil.normalize(deadlineList)
         cloudletSchedulerUtil.normalize(energy_list)
-        
+
         deltaTauList = []
         deltaTauList_shadow = []
-        length =len(miList)
+        length =len(deadlineList)
         for i in range(length):
-            deltaTau = miList[i]*W_mi + storageList[i]*W_storage +deadlineList[i]*W_deadline + energy_list[i]*W_energy
+            #deltaTau = miList[i]*W_mi + storageList[i]*W_storage +deadlineList[i]*W_deadline + energy_list[i]*W_energy
+            deltaTau = deadlineList[i]*W_deadline + energy_list[i]*W_energy
             deltaTauList.append(deltaTau)
-            deltaTauList_shadow.append(miList[i]*0.3 + storageList[i]*0.3 +deadlineList[i]*0.4)
+            #deltaTauList_shadow.append(miList[i]*0.3 + storageList[i]*0.3 +deadlineList[i]*0.4)
+            deltaTauList_shadow.append(deadlineList[i])
+            
             
         index = deltaTauList.index(min(deltaTauList))
         
+        #return index,min(deltaTauList),deltaTauList_shadow[index]
         return index,min(deltaTauList),deltaTauList_shadow[index]
         
 
@@ -667,36 +673,37 @@ class AntColonyScheduler(CloudletScheduler):
                             VM_outof_resources.append(t)
 
                     for vm in self.vmList:
-                        temp_MI_violation      = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).MI - vm.currentAvailableMips)
-                        temp_storage_violation = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).storage - vm.currentAvailableStorage)
+                        #temp_MI_violation      = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).MI - vm.currentAvailableMips)
+                        #temp_storage_violation = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).storage - vm.currentAvailableStorage)
                         try:
                             temp_deadline_violation = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).runtime - self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).MI / vm.currentAvailableMips)
                         except ZeroDivisionError:
                             temp_deadline_violation = sys.float_info.max
         
-                        MI_violation_list.append( temp_MI_violation )
-                        storage_violation_list.append( temp_storage_violation )
+                        #MI_violation_list.append( temp_MI_violation )
+                        #storage_violation_list.append( temp_storage_violation )
                         deadline_violation_list.append( temp_deadline_violation )
                         #vm.addTask(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])))
                         energy_consumption_list.append(self.__partialEnergyConsumption(vm,self.workflow.taskDict.get(str(temp_ACO_list[ant_position]))))
                         
                     #Heuristic information calculation--------------------------------------------------------------------------------------------
                     
-                    length_1 = len(MI_violation_list)                
+                    length_1 = len(deadline_violation_list)                
                     
-                    cloudletSchedulerUtil.normalize(MI_violation_list)
-                    cloudletSchedulerUtil.normalize(storage_violation_list)
+                    #cloudletSchedulerUtil.normalize(MI_violation_list)
+                    #cloudletSchedulerUtil.normalize(storage_violation_list)
                     cloudletSchedulerUtil.normalize(deadline_violation_list)
                     cloudletSchedulerUtil.normalize(energy_consumption_list)
                     
                     eta_list   = []                                       # list of the eta for all the edges from one task to all VMs
                     W_MI       = 0.2                                          # weightage for MI
                     W_storage  = 0.1                                     # weightage for storage
-                    W_deadline = 0.2
+                    W_deadline = 0.5
                     W_energy = 0.5                                    # weightage for deadline
                     
                     for i in range(length_1):
-                        eta_list.append( ( MI_violation_list[i] * W_MI  +  storage_violation_list[i] * W_storage  +  deadline_violation_list[i] * W_deadline + energy_consumption_list[i] * W_energy) )
+                        #eta_list.append( ( MI_violation_list[i] * W_MI  +  storage_violation_list[i] * W_storage  +  deadline_violation_list[i] * W_deadline + energy_consumption_list[i] * W_energy) )
+                        eta_list.append( deadline_violation_list[i] * W_deadline + energy_consumption_list[i] * W_energy) 
                                     
                     #Heuristic information calculation--------------------------------------------------------------------------------------------
 
@@ -736,15 +743,15 @@ class AntColonyScheduler(CloudletScheduler):
                     #--------------------------------------------------------------------------------------------------------------------------
                     
                     # Calculations for Global pheromone update---------------------------------------------------------------------------------
-                    SLA_MI_global = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).MI - self.vmList[largest_probability_index].currentAvailableMips)
+                    #SLA_MI_global = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).MI - self.vmList[largest_probability_index].currentAvailableMips)
 
                     #if(SLA_MI_global < 0):
                     #    SLA_MI_global=0
                     
-                    SLA_storage_global = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).storage - self.vmList[largest_probability_index].currentAvailableStorage)
+                    #SLA_storage_global = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).storage - self.vmList[largest_probability_index].currentAvailableStorage)
                     
-                    if(SLA_storage_global < 0):
-                        SLA_storage_global=0
+                    #if(SLA_storage_global < 0):
+                    #    SLA_storage_global=0
                     
                     try:
                         SLA_deadline_global = float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).runtime - self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).MI / self.vmList[largest_probability_index].currentAvailableMips)
@@ -757,13 +764,14 @@ class AntColonyScheduler(CloudletScheduler):
                     MI_required_global_list.append(float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).MI))
                     storage_required_global_list.append(float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).storage))
                     deadline_required_global_list.append(float(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).runtime))
-                    SLAV_MI_global_list.append(SLA_MI_global)
-                    SLAV_storage_global_list.append(SLA_storage_global)
+                    #SLAV_MI_global_list.append(SLA_MI_global)
+                    #SLAV_storage_global_list.append(SLA_storage_global)
                     SLAV_deadline_global_list.append(SLA_deadline_global)
                     
                     #------------------------------------------------------------------------------------------------------------------------
                             
                     ant_allocation = Allocation(self.workflow.taskDict.get(str(temp_ACO_list[ant_position])).id,self.vmList[largest_probability_index].id,self.vmList[largest_probability_index].globalVMId)
+                    
                     ant_allocation_list.append(ant_allocation)                  # puting this allocation in the list
                     count = count-1                                             # decrement the ACO list count
 
@@ -794,23 +802,23 @@ class AntColonyScheduler(CloudletScheduler):
                     
                     
                     for i in range(temp_SLAV_len):
-                        SLAV_storage_global = SLAV_storage_global + SLAV_storage_global_list[i] #this can be grerater than 1
-                        SLAV_MI_global = SLAV_MI_global + SLAV_MI_global_list[i]
+                        #SLAV_storage_global = SLAV_storage_global + SLAV_storage_global_list[i] #this can be grerater than 1
+                        #SLAV_MI_global = SLAV_MI_global + SLAV_MI_global_list[i]
                         SLAV_deadline_global = SLAV_deadline_global + SLAV_deadline_global_list[i]
-                        temp_SLAV_MI_global_required = temp_SLAV_MI_global_required + MI_required_global_list[i]
-                        temp_SLAV_storage_global_required = temp_SLAV_storage_global_required + storage_required_global_list[i]
+                        #temp_SLAV_MI_global_required = temp_SLAV_MI_global_required + MI_required_global_list[i]
+                        #temp_SLAV_storage_global_required = temp_SLAV_storage_global_required + storage_required_global_list[i]
                         temp_SLAV_deadline_global_required = temp_SLAV_deadline_global_required + deadline_required_global_list[i]
                     
 
-                    try:
-                        SLAV_MI_tau_global_list.append(SLAV_MI_global / temp_SLAV_MI_global_required ) 
-                    except ZeroDivisionError:
-                        SLAV_MI_tau_global_list.append(sys.float_info.max)
+                    #try:
+                    #    SLAV_MI_tau_global_list.append(SLAV_MI_global / temp_SLAV_MI_global_required ) 
+                    #except ZeroDivisionError:
+                    #    SLAV_MI_tau_global_list.append(sys.float_info.max)
                     
-                    try:                
-                        SLAV_storage_tau_global_list.append( SLAV_storage_global / temp_SLAV_storage_global_required )
-                    except ZeroDivisionError:
-                        SLAV_storage_tau_global_list.append(sys.float_info.max)
+                    #try:                
+                    #    SLAV_storage_tau_global_list.append( SLAV_storage_global / temp_SLAV_storage_global_required )
+                    #except ZeroDivisionError:
+                    #    SLAV_storage_tau_global_list.append(sys.float_info.max)
                         
                     try:
                         SLAV_deadline_tau_global_list.append( SLAV_deadline_global / temp_SLAV_deadline_global_required )
@@ -829,11 +837,11 @@ class AntColonyScheduler(CloudletScheduler):
                     ants_allocation_list.append(ant_allocation_list)
                     
                     #printing ant allocation list
-                    ##cloudletSchedulerUtil.print_allocations(ant_allocation_list,it,nA)
+                    cloudletSchedulerUtil.print_allocations(ant_allocation_list,it,nA)
 
             #performing global pheromone update---------------------------------------------------------------------------------------------
             
-            if(len(SLAV_MI_tau_global_list) > 0):
+            if(len(SLAV_deadline_tau_global_list) > 0):
                 indexMin,minDeltaTau,minDeltaTau_shadow = self.__calculateDeltaTau(SLAV_MI_tau_global_list, SLAV_storage_tau_global_list, SLAV_deadline_tau_global_list,energy_list)
                 ant_allocation_list = self.__globalUpdatePheromoneVMLevel(indexMin,minDeltaTau,ants_allocation_list)
                 self.__globalUpdatePheromoneTaskLevel(indexMin,minDeltaTau,ants_allocation_list)
@@ -919,11 +927,11 @@ class AntColonyScheduler(CloudletScheduler):
             for SLAViolation in self.cloudlet.SLAViolationList:
                 sumSLAViolation = sumSLAViolation + SLAViolation
 
-            averageSLAViolation = sumSLAViolation / len(self.cloudlet.SLAViolationList) 
+            #averageSLAViolation = sumSLAViolation / len(self.cloudlet.SLAViolationList) 
 
-            print "Average SLA Violation is ::",averageSLAViolation
+            #print "Average SLA Violation is ::",averageSLAViolation
             
-            cloudletSchedulerUtil.printf("Average SLA Violation is ::"+str(averageSLAViolation))
+            #cloudletSchedulerUtil.printf("Average SLA Violation is ::"+str(averageSLAViolation))
 
             print "Execution Start Time::",self.cloudlet.execStartTime
             
