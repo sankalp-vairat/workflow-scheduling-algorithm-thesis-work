@@ -25,7 +25,12 @@ import threading
 from scheduler.antcolonyscheduler.AntColonyScheduler import AntColonyScheduler
 from power.PowerModelOur import PowerModelOur
 from scheduler.CloudletSchedulerUtil import CloudletSchedulerUtil
-
+import os
+import affinity
+import multiprocessing
+print "affinity is :",affinity.get_process_affinity_mask(0) 
+affinity.set_process_affinity_mask(0,2**multiprocessing.cpu_count()-1)
+print "affinity Modified :",affinity.get_process_affinity_mask(0) 
 #syntheticGenerator =SyntheticGenerator('CyberShake_30.xml')
 #syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
 
@@ -38,7 +43,7 @@ dataCentre.setUpDatacentre(10,200,20, 8,powerModelOur)
 #noOfTasks, noOfLevels, runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperBound, type 
 #randomGenerator = RandomWorkFlowGenerator(2000,100,1,10,1,10,1000,10000,'RandomForkJoinWorkFlow')
 #workflow = randomGenerator.randomWorkFlowGenerator()
-syntheticGenerator =SyntheticGenerator('CyberShake_30.xml')
+syntheticGenerator =SyntheticGenerator('CyberShake_100.xml')
 workflow = syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
 
 workflow.createTaskDictionary()
@@ -47,7 +52,7 @@ minMin = MinMinScheduler()
 maxMin = MaxMinScheduler()
 antColonyScheduler = AntColonyScheduler()
 
-cloudletSchedulerUtil.printf("Cybershake:"+str(30))
+cloudletSchedulerUtil.printf("CyberShake_100:"+str(100))
 cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
 cloudletSchedulerUtil.printf("MinMin Started");
 cloudletScheduler = CloudletScheduler(minMin)

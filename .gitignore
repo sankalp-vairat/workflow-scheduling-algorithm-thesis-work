@@ -4,3 +4,4 @@ generator/*.pyc
 *.pyc
 *.xml
 *.txt
+*.settings

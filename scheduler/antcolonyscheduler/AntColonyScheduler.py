@@ -50,10 +50,10 @@ global noOfTasks
 noOfTasks = 0
 
 global no_Of_Ants
-no_Of_Ants = 50
+no_Of_Ants = 500
 
 global iterations
-iterations = 100
+iterations = 1000
 
 global pheromone_task_level
 pheromone_task_level = []
