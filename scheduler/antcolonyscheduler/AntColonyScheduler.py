@@ -569,6 +569,8 @@ class AntColonyScheduler(CloudletScheduler):
             energyConsumed.append(energyConsumedByHost)
         return totalEnergyConsumed
 
+
+
     def __calculateDeltaTau(self,miList,storageList,deadlineList,energy_list):
         #cloudletSchedulerUtil.normalize(miList)
         #cloudletSchedulerUtil.normalize(storageList)
@@ -590,6 +592,8 @@ class AntColonyScheduler(CloudletScheduler):
         
         #return index,min(deltaTauList),deltaTauList_shadow[index]
         return index,min(deltaTauList),deltaTauList_shadow[index]
+
+
         
 
     def __resetVMs(self):

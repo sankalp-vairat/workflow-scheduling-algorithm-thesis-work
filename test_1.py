@@ -1661,9 +1661,176 @@ def Main_test_1():
 
     for j in range(starting_vertices_len):
         synchronized_queue(2, starting_vertices[j])
+'''
+Created on 21-Feb-2017
 
+@author: itadmin
+'''
+
+
+import theano.tensor as T
+import numpy
+from theano import function
+import random
+import timeit
+
+x = T.dmatrix('x')
+
+y = T.dmatrix('y')
+
+z = x + y
+
+f = function([x, y], z)
+q = 3000
+s = timeit.default_timer()
+f(numpy.random.rand(q,q), numpy.random.rand(q,q))
+c =  numpy.random.rand(q,q)
+e = timeit.default_timer()
+
+print e-s
+
+
+print "-------------------------------------------------"
+s = timeit.default_timer()
+a =  numpy.random.rand(q,q)
+b =  numpy.random.rand(q,q)
+c =  numpy.random.rand(q,q)
+
+for i in range(q):
+    for j in range(q):
+        c[i][j] = a[i][j] + b[i][j]
+        
+e = timeit.default_timer()
+
+print e-s
     
     print "total_time",total_time
 
 
-Main_test_1()
+Main_test_1()'''
+Created on 21-Feb-2017
+
+@author: itadmin
+'''
+
+
+import theano.tensor as T
+import numpy
+from theano import function
+import random
+import timeit
+
+x = T.dmatrix('x')
+
+y = T.dmatrix('y')
+
+z = x + y
+
+f = function([x, y], z)
+q = 3000
+s = timeit.default_timer()
+f(numpy.random.rand(q,q), numpy.random.rand(q,q))
+c =  numpy.random.rand(q,q)
+e = timeit.default_timer()
+
+print e-s
+
+
+print "-------------------------------------------------"
+s = timeit.default_timer()
+a =  numpy.random.rand(q,q)
+b =  numpy.random.rand(q,q)
+c =  numpy.random.rand(q,q)
+
+for i in range(q):
+    for j in range(q):
+        c[i][j] = a[i][j] + b[i][j]
+        
+e = timeit.default_timer()
+
+print e-s'''
+Created on 21-Feb-2017
+
+@author: itadmin
+'''
+
+
+import theano.tensor as T
+import numpy
+from theano import function
+import random
+import timeit
+
+x = T.dmatrix('x')
+
+y = T.dmatrix('y')
+
+z = x + y
+
+f = function([x, y], z)
+q = 3000
+s = timeit.default_timer()
+f(numpy.random.rand(q,q), numpy.random.rand(q,q))
+c =  numpy.random.rand(q,q)
+e = timeit.default_timer()
+
+print e-s
+
+
+print "-------------------------------------------------"
+s = timeit.default_timer()
+a =  numpy.random.rand(q,q)
+b =  numpy.random.rand(q,q)
+c =  numpy.random.rand(q,q)
+
+for i in range(q):
+    for j in range(q):
+        c[i][j] = a[i][j] + b[i][j]
+        
+e = timeit.default_timer()
+
+print e-s
+
+
+'''
+Created on 21-Feb-2017
+
+@author: itadmin
+'''
+
+
+import theano.tensor as T
+import numpy
+from theano import function
+import random
+import timeit
+
+x = T.dmatrix('x')
+
+y = T.dmatrix('y')
+
+z = x + y
+
+f = function([x, y], z)
+q = 3000
+s = timeit.default_timer()
+f(numpy.random.rand(q,q), numpy.random.rand(q,q))
+c =  numpy.random.rand(q,q)
+e = timeit.default_timer()
+
+print e-s
+
+
+print "-------------------------------------------------"
+s = timeit.default_timer()
+a =  numpy.random.rand(q,q)
+b =  numpy.random.rand(q,q)
+c =  numpy.random.rand(q,q)
+
+for i in range(q):
+    for j in range(q):
+        c[i][j] = a[i][j] + b[i][j]
+        
+e = timeit.default_timer()
+
+print e-s
