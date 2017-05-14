@@ -8,7 +8,7 @@ sankalp
 
 from generator.randomgenerator.RandomWorkFlowGenerator import RandomWorkFlowGenerator
 from workflow.WorkFlow import WorkFlow
-from generator.randomgenerator.RandomGenerator import RandomGenerator
+from generator.randomgenerator import RandomGenerator.RandomGenerator
 #randomWorkFlowGenerator = RandomWorkFlowGenerator(8,4,10,20,10,20,10,20,"RandomWorkFlow")
 
 #randomWorkFlowGenerator.randomWorkFlowGenerator()
@@ -26,11 +26,7 @@ from scheduler.antcolonyscheduler.AntColonyScheduler import AntColonyScheduler
 from power.PowerModelOur import PowerModelOur
 from scheduler.CloudletSchedulerUtil import CloudletSchedulerUtil
 import os
-import affinity
 import multiprocessing
-print "affinity is :",affinity.get_process_affinity_mask(0) 
-affinity.set_process_affinity_mask(0,2**multiprocessing.cpu_count()-1)
-print "affinity Modified :",affinity.get_process_affinity_mask(0) 
 #syntheticGenerator =SyntheticGenerator('CyberShake_30.xml')
 #syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
 

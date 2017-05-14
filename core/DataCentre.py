@@ -38,3 +38,9 @@ class DataCentre:
         randomGenerator = RandomGenerator()
         self.__setHostList(randomGenerator.randomHostGenerator(numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost,powerModel))
         self.__setVmList(self.getHostList())
+
+
+    def setUpDefinedDatacentre(self,numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost,powerModel):
+        randomGenerator = RandomGenerator()
+        self.__setHostList(randomGenerator.randomHostGenerator(numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost,powerModel))
+        self.__setVmList(self.getHostList())
