@@ -69,9 +69,13 @@ class WorkFlow:
                     
     def createDAG(self):
         global DAG
+        #DAG = []
         global MI
+        #MI = []
         global storage
+        #storage = []
         global deadline
+        #deadline = []
         
         self._computeDataDependencies()
 

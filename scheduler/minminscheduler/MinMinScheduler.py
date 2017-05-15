@@ -15,6 +15,8 @@ from scheduler.CloudletSchedulerUtil import CloudletSchedulerUtil
 import threading
 import sys
 
+global real_execution_time
+real_execution_time = 0
 global cloudletSchedulerUtil
 cloudletSchedulerUtil = CloudletSchedulerUtil()
 
@@ -56,9 +58,17 @@ class MinMinScheduler(CloudletScheduler):
         self.dependencyMatrix = None
 
     def execute(self,cloudlet,dataCentre):
+        global real_execution_time
+        real_execution_time = 0
+        global noOfTasks 
+        noOfTasks = 0
+        global total_time
+        
+        total_time = 0
         self.cloudlet = cloudlet
+        self.cloudlet.energyConsumption = 0
         self.workflow = self.cloudlet.getWorkFlow()
-        cloudlet.setExecStartTime(time.asctime())
+        self.cloudlet.setExecStartTime(time.asctime())
         self.vmList = copy.deepcopy(dataCentre.getVMList())
         self.DAG_matrix = self.workflow.DAG_matrix
         
@@ -204,7 +214,8 @@ class MinMinScheduler(CloudletScheduler):
                     utilizationMips = utilizationMips + tasksList[i+1].MI
                     flag =False
                 else:
-                    EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    #EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
                     energyConsumedByHost.append(EnergyConsumed)
                     totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
                     hostDict.get(hostID).utilizationMips = hostDict.get(hostID).utilizationMips - utilizationMips
@@ -222,6 +233,7 @@ class MinMinScheduler(CloudletScheduler):
         global W_storage
         global noOfTasks
         global total_time
+        global real_execution_time
         
         while(global_queue.qsize() != 0):
             minMinList.append(global_queue.get())
@@ -236,6 +248,7 @@ class MinMinScheduler(CloudletScheduler):
         totalRuntime = 0
 
         lenMinMinList = len(minMinList)
+        real_execution_time_temp = 0
         for l in range(lenMinMinList):
             allocation = Allocation()
             minimumExecTime =  sys.float_info.max
@@ -260,8 +273,11 @@ class MinMinScheduler(CloudletScheduler):
                     except ZeroDivisionError:
                         execTimeList.append(None)
                     tempVMIndex = tempVMIndex + 1
+            task = self.workflow.taskDict.get(str(taskSelectedIndex))
+            if(real_execution_time_temp < task.runtime):
+                 real_execution_time_temp = task.runtime
             del minMinList [minMinList.index(taskSelectedIndex)]
-
+        
             #SLA violation calculation
             SLAVMi = SLAVMi + (self.workflow.taskDict.get(allocation.taskId).MI - self.vmList[vmIndex].currentAvailableMips)
             SLAVStorage = SLAVStorage + 0 if(self.workflow.taskDict.get(allocation.taskId).storage - self.vmList[vmIndex].currentAvailableStorage)<0 else (self.workflow.taskDict.get(allocation.taskId).storage - self.vmList[vmIndex].currentAvailableStorage)
@@ -287,6 +303,8 @@ class MinMinScheduler(CloudletScheduler):
 
             noOfTasks = noOfTasks + 1
             
+        real_execution_time = real_execution_time +real_execution_time_temp
+            
         SLAViolation = (( 0 if SLAVMi < 0 else SLAVMi) / totalMi) * W_mi + ( (0 if SLAVStorage < 0 else SLAVStorage)  / totalStorage) * W_storage + ((0 if SLAVRuntime < 0 else SLAVRuntime) / totalRuntime) * W_deadline
         self.cloudlet.addSLAViolationList(SLAViolation)
             
@@ -299,6 +317,8 @@ class MinMinScheduler(CloudletScheduler):
         total_time = total_time + self.__makespanCalculations(allocationList)         
 
         if(noOfTasks == self.DAG_matrix.DAGRows):
+            
+            print "Real Execution Time :",real_execution_time
 
             print "Total Energy Consumed is ::",self.cloudlet.energyConsumption
             cloudletSchedulerUtil.printf( "Total Energy Consumed is ::"+str(self.cloudlet.energyConsumption))

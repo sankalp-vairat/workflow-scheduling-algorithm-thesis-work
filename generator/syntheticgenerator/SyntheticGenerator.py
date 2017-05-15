@@ -37,7 +37,8 @@ class SyntheticGenerator():
         dictionaryOfTasks =  {}
         for job in root.findall('{http://pegasus.isi.edu/schema/DAX}job'):
             files = job.findall('{http://pegasus.isi.edu/schema/DAX}uses')
-            mi = random.uniform(miLowerBound, miUpperBound)
+            #mi = random.uniform(miLowerBound, miUpperBound)
+            mi = 15000 * float(job.get('runtime'))*SECONDS
             task = Task(id="task_%s"% int(job.get('id')[2:]), namespace=job.get('namespace'), name=job.get('name'), runtime=float(job.get('runtime'))*SECONDS, MI=mi)
             size = 0
             for file in files:

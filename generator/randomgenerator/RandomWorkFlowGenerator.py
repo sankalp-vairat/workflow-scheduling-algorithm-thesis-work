@@ -300,8 +300,8 @@ class RandomWorkFlowGenerator(RandomGenerator):
                 except:
                     k = 1
                 
-                print "len(globalAvailableTasks)",len(globalAvailableTasks)
-                print "k",k
+                #print "len(globalAvailableTasks)",len(globalAvailableTasks)
+                #print "k",k
                 
                 parents = random.sample(globalAvailableTasks, k)
                 

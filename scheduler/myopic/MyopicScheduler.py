@@ -56,9 +56,14 @@ class MyopicScheduler(CloudletScheduler):
         self.dependencyMatrix = None
 
     def execute(self,cloudlet,dataCentre):
+        global noOfTasks 
+        noOfTasks = 0
+        global total_time
+        total_time = 0
         self.cloudlet = cloudlet
         self.workflow = self.cloudlet.getWorkFlow()
-        cloudlet.setExecStartTime(time.asctime())
+        self.cloudlet.setExecStartTime(time.asctime())
+        self.cloudlet.energyConsumption = 0
         self.vmList = copy.deepcopy(dataCentre.getVMList())
         self.DAG_matrix = self.workflow.DAG_matrix
         
@@ -204,7 +209,8 @@ class MyopicScheduler(CloudletScheduler):
                     utilizationMips = utilizationMips + tasksList[i+1].MI
                     flag =False
                 else:
-                    EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    #EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
                     energyConsumedByHost.append(EnergyConsumed)
                     totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
                     hostDict.get(hostID).utilizationMips = hostDict.get(hostID).utilizationMips - utilizationMips

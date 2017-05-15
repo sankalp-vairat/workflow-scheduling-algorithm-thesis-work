@@ -55,7 +55,12 @@ class MaxMinScheduler(CloudletScheduler):
         self.dependencyMatrix = None
 
     def execute(self,cloudlet,dataCentre):
+        global noOfTasks 
+        noOfTasks = 0
+        global total_time
+        total_time = 0
         self.cloudlet = cloudlet
+        self.cloudlet.energyConsumption = 0
         self.workflow = self.cloudlet.getWorkFlow()
         cloudlet.setExecStartTime(time.asctime())
         self.vmList = copy.deepcopy(dataCentre.getVMList())
@@ -203,7 +208,8 @@ class MaxMinScheduler(CloudletScheduler):
                     utilizationMips = utilizationMips + tasksList[i+1].MI
                     flag =False
                 else:
-                    EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    #EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
                     energyConsumedByHost.append(EnergyConsumed)
                     totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
                     hostDict.get(hostID).utilizationMips = hostDict.get(hostID).utilizationMips - utilizationMips
