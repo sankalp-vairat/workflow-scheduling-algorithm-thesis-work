@@ -8,7 +8,7 @@ sankalp
 
 from generator.randomgenerator.RandomWorkFlowGenerator import RandomWorkFlowGenerator
 from workflow.WorkFlow import WorkFlow
-from generator.randomgenerator import RandomGenerator.RandomGenerator
+from generator.randomgenerator.RandomGenerator import RandomGenerator
 #randomWorkFlowGenerator = RandomWorkFlowGenerator(8,4,10,20,10,20,10,20,"RandomWorkFlow")
 
 #randomWorkFlowGenerator.randomWorkFlowGenerator()
@@ -35,11 +35,12 @@ cloudletSchedulerUtil =CloudletSchedulerUtil()
 dataCentre = DataCentre(1)
 powerModelOur = PowerModelOur()
 #numberOfHosts,maxStorage(GB --> KB),maxMipsPerPe*1000,maxPesPerHost,powerModel
-dataCentre.setUpDatacentre(10,200,20, 8,powerModelOur)
+#dataCentre.setUpDatacentre(10,200,20, 8,powerModelOur)
+dataCentre.setUpDefinedDatacentre(5,200)
 #noOfTasks, noOfLevels, runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperBound, type 
 #randomGenerator = RandomWorkFlowGenerator(2000,100,1,10,1,10,1000,10000,'RandomForkJoinWorkFlow')
 #workflow = randomGenerator.randomWorkFlowGenerator()
-syntheticGenerator =SyntheticGenerator('CyberShake_100.xml')
+syntheticGenerator =SyntheticGenerator('CyberShake_30.xml')
 workflow = syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
 
 workflow.createTaskDictionary()

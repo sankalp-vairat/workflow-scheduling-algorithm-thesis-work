@@ -3,7 +3,7 @@ Created on 15-May-2017
 
 @author: sankalp
 '''
-
+#Intel Xeon E5-2699 v3 2.30GHz 18-Core --> 36 cores, 2 chips
 
 from power.PowerModelSpecPower import PowerModelSpecPower
 class PowerModelSpecPowerFujitsuServerPRIMERGYTX2560M1(PowerModelSpecPower):

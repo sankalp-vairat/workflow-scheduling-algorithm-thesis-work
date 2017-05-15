@@ -25,11 +25,14 @@ class PowerHost(HostDynamicWorkload):
     
     def getPower(self):
         return self.getPowerUtility(self.getUtilizationOfCPU())
+
+    def getEnergyDefinedHost(self,utilizationMips,totalUtilizationMips,currentCompletionTime):
+        return self.getPowerUtility(utilizationMips/totalUtilizationMips)
         
         
     def getPowerUtility(self,utilization):
         power = 0
-
+        #power = self.getPowerModel().getPowerData(utilization)
         try:
             power = self.getPowerModel().getPower(utilization)
 

@@ -5,6 +5,7 @@ Created on 11-Mar-2017
 '''
 
 from generator.randomgenerator.RandomGenerator import RandomGenerator
+from generator.definedgenerator.DefinedGenerator import DefinedGenerator
 
 class DataCentre:
 
@@ -40,7 +41,7 @@ class DataCentre:
         self.__setVmList(self.getHostList())
 
 
-    def setUpDefinedDatacentre(self,numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost,powerModel):
-        randomGenerator = RandomGenerator()
-        self.__setHostList(randomGenerator.randomHostGenerator(numberOfHosts,maxStorage,maxMipsPerPe,maxPesPerHost,powerModel))
+    def setUpDefinedDatacentre(self,numberOfHosts,maxStorage):
+        definedGenerator = DefinedGenerator()
+        self.__setHostList(definedGenerator.DefinedHostGenerator(numberOfHosts,maxStorage))
         self.__setVmList(self.getHostList())

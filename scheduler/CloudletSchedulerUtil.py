@@ -161,7 +161,7 @@ class CloudletSchedulerUtil:
         (SIDE)EFFECTS: 
         
         ''' 
-        
+        '''
         temp_len=len(ant_allocation_list)
         
         self.printf_intermediate("Iteration::"+str(iteration)+"\t"+"Ant::"+str(ant))
@@ -170,5 +170,6 @@ class CloudletSchedulerUtil:
             VM = ant_allocation_list[i].assignedVMId
             globalVMId = ant_allocation_list[i].assignedVMGlobalId
             self.printf_intermediate("Task:: "+str(task)+"\t"+"VM:: "+str(VM)+"\t"+"Global VM:: "+str(globalVMId))
-
+        '''
+        pass
     #-------------------------------------------------------------------------------------------------------------------------------------

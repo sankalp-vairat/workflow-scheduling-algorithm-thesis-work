@@ -4,7 +4,10 @@ Created on 15-May-2017
 @author: sankalp
 '''
 
-#Intel(R) Xeon(R) CPU X5570 Quad-Core, 2.93GHz --> 8 cores, 2 chips
+#Intel(R) Xeon(R) CPU X5570 Quad-Core, 2.93GHz --> 8 cores, 2 chips0
+
+noOfCores = 8
+mipsPerPe = 15000
 
 from power.PowerModelSpecPower import PowerModelSpecPower
 class PowerModelSpecPowerAppleIncXserve31(PowerModelSpecPower):

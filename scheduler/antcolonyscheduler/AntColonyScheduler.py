@@ -50,10 +50,10 @@ global noOfTasks
 noOfTasks = 0
 
 global no_Of_Ants
-no_Of_Ants = 500
+no_Of_Ants = 100
 
 global iterations
-iterations = 1000
+iterations = 100
 
 global pheromone_task_level
 pheromone_task_level = []
@@ -68,10 +68,10 @@ global tau_0_VM
 tau_0_VM = 0.2
 
 global rho_task
-rho_task = 0.2
+rho_task = 0.3
 
 global rho_VM
-rho_VM = 0.2
+rho_VM = 0.3
 
 global noOfVMs
 noOfVMs = 0
@@ -170,8 +170,7 @@ class AntColonyScheduler(CloudletScheduler):
         #print "Performing pheromone evaporation task level.............."
         
         for i in range(p_row_task):
-            for j in range(p_column_task):
-                pheromone_task_level[i][j] = (1 - rho_task) * pheromone_task_level[i][j];
+            pheromone_task_level[i] = (1 - rho_task) * pheromone_task_level[i];
 
 
     def __evaporationVMLevel(self):
@@ -200,8 +199,8 @@ class AntColonyScheduler(CloudletScheduler):
         
         '''         
         #print "performing local pheromone update at task level................."
-        
-        phi=0.2                                                                         #decay coefficient
+
+        phi=0.4                                                                         #decay coefficient
         pheromone_task_level[i]=(1-phi)*pheromone_task_level[i]+phi*tau_0_task
 
 
@@ -216,7 +215,7 @@ class AntColonyScheduler(CloudletScheduler):
         
         #print "performing local pheromone update at VM level................."
                      
-        phi=0.2                                                                         #decay coefficient
+        phi=0.4                                                                         #decay coefficient
         pheromone_VM_level[i][j]=(1-phi)*pheromone_VM_level[i][j]+phi*tau_0_VM
 
 
@@ -244,7 +243,7 @@ class AntColonyScheduler(CloudletScheduler):
         for i in range(1,temp_len):
             gamma=gamma + 0.1
             task = int(ant_allocation_list[i].taskID.split('_')[1])
-            #VM = ant_allocation_list[i].assigned_VM
+            #VM = ant_allogetEnergycation_list[i].assigned_VM
             pheromone_task_level[task] = (1 - rho_task) * pheromone_task_level[task] + rho_task * (1 - minDeltaTau**gamma)
 
 
@@ -392,8 +391,8 @@ class AntColonyScheduler(CloudletScheduler):
 
         #Heuristic information calculation--------------------------------------------------------------------------------------------
                     
-        alpha_pheromone = 0.3                 # weightage for the pheromone
-        beta_eta = 0.4                        # weightage for the eta(heuristic information) 
+        alpha_pheromone = 0.05                 # weightage for the pheromone
+        beta_eta = 0.1                       # weightage for the eta(heuristic information) 
         alpha_pheromone_mult_beta_eta = 0
             
         for i in range(temp_len):    
@@ -490,7 +489,7 @@ class AntColonyScheduler(CloudletScheduler):
                 utilizationMips = utilizationMips + tasksList[i+1].MI
                 flag =False
             else:
-                EnergyConsumed = host.getEnergy(totalUtilizationMips,host.getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                EnergyConsumed = host.getEnergyDefinedHost(totalUtilizationMips,host.getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
                 energyConsumed.append(EnergyConsumed)
                 totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
                 totalUtilizationMips = totalUtilizationMips - utilizationMips
@@ -560,7 +559,7 @@ class AntColonyScheduler(CloudletScheduler):
                     utilizationMips = utilizationMips + tasksList[i+1].MI
                     flag =False
                 else:
-                    EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
                     energyConsumedByHost.append(EnergyConsumed)
                     totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
                     hostDict.get(hostID).utilizationMips = hostDict.get(hostID).utilizationMips - utilizationMips
@@ -711,8 +710,8 @@ class AntColonyScheduler(CloudletScheduler):
                                     
                     #Heuristic information calculation--------------------------------------------------------------------------------------------
 
-                    alpha_pheromone = 0.3                 # weightage for the pheromone
-                    beta_eta        = 0.4                 # weightage for the eta(heuristic information) 
+                    alpha_pheromone = 0.05                 # weightage for the pheromone
+                    beta_eta        = 0.1                 # weightage for the eta(heuristic information) 
                     alpha_pheromone_mult_beta_eta = 0
 
                     for i in range(p_column_VM):    
@@ -837,6 +836,7 @@ class AntColonyScheduler(CloudletScheduler):
                     ##cloudletSchedulerUtil.printf("----------------------------------------------")
                     #performing evaporation on VM-task graph------------------------------------------------------------------------------------
                     self.__evaporationVMLevel()
+                    self.__evaporationTaskLevel()
                     
                     ants_allocation_list.append(ant_allocation_list)
                     
@@ -1003,7 +1003,5 @@ class AntColonyScheduler(CloudletScheduler):
 
     def __ACOSchedulerUtil(self):
         while(noOfTasks < self.DAG_matrix.DAGRows):
-            #print "hello"
             self.__synchronizedQueue(1,0)
             time.sleep(2)
-        #threading.current_thread().__stop()

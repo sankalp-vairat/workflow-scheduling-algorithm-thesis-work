@@ -8,11 +8,14 @@ import math
 class PowerModelSpecPower(PowerModel):
     
     def getPower(self,utilization):
-        if (utilization < 0 or utilization > 1):
+        if (utilization < 0):
             try:
                 raise Exception()
             except Exception:
                 print "Utilization value must be between 0 and 1"
+        if(utilization > 0):
+            utilization = 1
+
         if (utilization % 0.1 == 0):
             return self.getPowerData((int) (utilization * 10));
 
