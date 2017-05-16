@@ -35,10 +35,10 @@ cloudletSchedulerUtil =CloudletSchedulerUtil()
 dataCentre = DataCentre(1)
 powerModelOur = PowerModelOur()
 #numberOfHosts,maxStorage(GB --> KB),maxMipsPerPe*1000,maxPesPerHost,powerModel
-dataCentre.setUpDatacentre(100,100,20, 5,powerModelOur)
-#dataCentre.setUpDefinedDatacentre(5,200)
+#dataCentre.setUpDatacentre(100,100,20, 5,powerModelOur)
+dataCentre.setUpDefinedDatacentre(5,200)
 #noOfTasks, noOfLevels, runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperBound, type 
-randomGenerator = RandomWorkFlowGenerator(100,10,1,10,1,10,1000,10000,'RandomForkJoinWorkFlow')
+randomGenerator = RandomWorkFlowGenerator(100,10,1,10,1,10,1000,10000,'RandomParallelWorkFlow')
 workflow = randomGenerator.randomWorkFlowGenerator()
 #syntheticGenerator =SyntheticGenerator('Sipht_30.xml')
 #workflow = syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
@@ -50,14 +50,6 @@ maxMin = MaxMinScheduler()
 antColonyScheduler = AntColonyScheduler()
 
 
-cloudletSchedulerUtil.printf("ACO Started");
-cloudletScheduler = CloudletScheduler(antColonyScheduler)
-cloudlet = Cloudlet(cloudletId = 1,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow)
-cloudletScheduler.executeScheduler(cloudlet,dataCentre)
-print "ACO ended"
-cloudletSchedulerUtil.printf("ACO ended");
-cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
-#--------------------------------------------------------------------------------------------------------------------------------
 
 cloudletSchedulerUtil.printf("CyberShake_100:"+str(100))
 cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
@@ -85,6 +77,14 @@ cloudletSchedulerUtil.printf("Myopic ended");
 print "Myopic ended"
 cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
 #------------------------------------------------------------------------------------------------------------------------------
+cloudletSchedulerUtil.printf("ACO Started");
+cloudletScheduler = CloudletScheduler(antColonyScheduler)
+cloudlet = Cloudlet(cloudletId = 1,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow)
+cloudletScheduler.executeScheduler(cloudlet,dataCentre)
+print "ACO ended"
+cloudletSchedulerUtil.printf("ACO ended");
+cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
+#--------------------------------------------------------------------------------------------------------------------------------
 
 print "****************************************************************************************************************************"
 
@@ -93,7 +93,7 @@ del MI[:]
 del deadline[:]
 del storage[:]
 
-randomGenerator = RandomWorkFlowGenerator(200,20,1,10,1,10,1000,10000,'RandomForkJoinWorkFlow')
+randomGenerator = RandomWorkFlowGenerator(200,20,1,10,1,10,1000,10000,'RandomParallelWorkFlow')
 workflow1 = randomGenerator.randomWorkFlowGenerator()
 
 #syntheticGenerator1 = SyntheticGenerator('Sipht_60.xml')
@@ -146,7 +146,62 @@ del MI[:]
 del deadline[:]
 del storage[:]
 
-randomGenerator = RandomWorkFlowGenerator(300,30,1,10,1,10,1000,10000,'RandomForkJoinWorkFlow')
+randomGenerator = RandomWorkFlowGenerator(300,30,1,10,1,10,1000,10000,'RandomParallelWorkFlow')
+workflow2 = randomGenerator.randomWorkFlowGenerator()
+
+#syntheticGenerator = SyntheticGenerator('Sipht_100.xml')
+#workflow2 = syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
+
+workflow2.createTaskDictionary()
+myopic = MyopicScheduler()
+minMin = MinMinScheduler()
+maxMin = MaxMinScheduler()
+antColonyScheduler = AntColonyScheduler()
+
+cloudletSchedulerUtil.printf("CyberShake_100:"+str(100))
+cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
+cloudletSchedulerUtil.printf("MinMin Started");
+cloudletScheduler = CloudletScheduler(minMin)
+cloudlet = Cloudlet(cloudletId = 3,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow2)
+cloudletScheduler.executeScheduler(cloudlet,dataCentre)
+print "MinMin ended"
+cloudletSchedulerUtil.printf("MinMin ended");
+cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
+#------------------------------------------------------------------------------------------------------------------------------
+cloudletSchedulerUtil.printf("max Started");
+cloudletScheduler = CloudletScheduler(maxMin)
+cloudlet = Cloudlet(cloudletId = 3,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow2)
+cloudletScheduler.executeScheduler(cloudlet,dataCentre)
+print "MaxMin ended"
+cloudletSchedulerUtil.printf("MaxMin ended");
+cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
+#-------------------------------------------------------------------------------------------------------------------------------
+cloudletSchedulerUtil.printf("Myopic Started");
+cloudletScheduler = CloudletScheduler(myopic)
+cloudlet = Cloudlet(cloudletId = 3,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow2)
+cloudletScheduler.executeScheduler(cloudlet,dataCentre)
+cloudletSchedulerUtil.printf("Myopic ended");
+print "Myopic ended"
+cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
+#------------------------------------------------------------------------------------------------------------------------------
+cloudletSchedulerUtil.printf("ACO Started");
+cloudletScheduler = CloudletScheduler(antColonyScheduler)
+cloudlet = Cloudlet(cloudletId = 3,userId = 'Sankalp',status = "executing", execStartTime = time.asctime(), workFlow = workflow2)
+cloudletScheduler.executeScheduler(cloudlet,dataCentre)
+print "ACO ended"
+cloudletSchedulerUtil.printf("ACO ended");
+cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
+#--------------------------------------------------------------------------------------------------------------------------------
+
+
+print "*******************************************************************************************************************************"
+
+del DAG[:]
+del MI[:]
+del deadline[:]
+del storage[:]
+
+randomGenerator = RandomWorkFlowGenerator(400,40,1,10,1,10,1000,10000,'RandomParallelWorkFlow')
 workflow2 = randomGenerator.randomWorkFlowGenerator()
 
 #syntheticGenerator = SyntheticGenerator('Sipht_100.xml')

@@ -52,7 +52,7 @@ global noOfTasks
 noOfTasks = 0
 
 global no_Of_Ants
-no_Of_Ants = 10
+no_Of_Ants = 30
 
 global iterations
 iterations = 10
@@ -494,8 +494,8 @@ class AntColonyScheduler(CloudletScheduler):
                 utilizationMips = utilizationMips + tasksList[i+1].MI
                 flag =False
             else:
-                #EnergyConsumed = host.getEnergyDefinedHost(totalUtilizationMips,host.getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
-                EnergyConsumed = host.getEnergy(totalUtilizationMips,host.getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                EnergyConsumed = host.getEnergyDefinedHost(totalUtilizationMips,host.getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                #EnergyConsumed = host.getEnergy(totalUtilizationMips,host.getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
                 energyConsumed.append(EnergyConsumed)
                 totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
                 totalUtilizationMips = totalUtilizationMips - utilizationMips
@@ -565,8 +565,8 @@ class AntColonyScheduler(CloudletScheduler):
                     utilizationMips = utilizationMips + tasksList[i+1].MI
                     flag =False
                 else:
-                    #EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
-                    EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    #EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
                     energyConsumedByHost.append(EnergyConsumed)
                     totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
                     hostDict.get(hostID).utilizationMips = hostDict.get(hostID).utilizationMips - utilizationMips
