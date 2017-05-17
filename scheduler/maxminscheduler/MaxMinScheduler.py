@@ -208,8 +208,8 @@ class MaxMinScheduler(CloudletScheduler):
                     utilizationMips = utilizationMips + tasksList[i+1].MI
                     flag =False
                 else:
-                    EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
-                    #EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    #EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
                     energyConsumedByHost.append(EnergyConsumed)
                     totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
                     hostDict.get(hostID).utilizationMips = hostDict.get(hostID).utilizationMips - utilizationMips
@@ -242,30 +242,43 @@ class MaxMinScheduler(CloudletScheduler):
         
         lenMaxMinList = len(maxMinList)
         for l in range(lenMaxMinList):
-            allocation = Allocation()
-            maximumExecTime =  0
+            
             taskSelectedIndex = 0
             vmIndex = 0
+            allocation_list = [None]*(lenMaxMinList-l)
+            execTimeList = [0]*(lenMaxMinList-l)
+            al = 0
             for taskIndex in maxMinList:
                 task = self.workflow.taskDict.get(str(taskIndex))
-                execTimeList = []
-                vmIndex = 0
-                tempVMIndex = 0
+                minimumExecTime =  sys.float_info.max
+                #tempVMIndex = 0
+                allocation = Allocation()
                 for vm in self.vmList:
                     try:
                         execTime = (task.MI / vm.currentAvailableMips)
-                        execTimeList.append(execTime)
-                        if(maximumExecTime < execTime):
-                            maximumExecTime = execTime
+			#print "execTime",execTime
+                        if(minimumExecTime > execTime):
+                            minimumExecTime = execTime
                             allocation.taskId = task.id.split('_')[1]
                             allocation.assignedVMId = vm.id
                             allocation.assignedVMGlobalId = vm.globalVMId
-                            taskSelectedIndex = taskIndex
-                            vmIndex = tempVMIndex
+                            #taskSelectedIndex = taskIndex
+                            #vmIndex = tempVMIndex
+                            allocation_list[al] = allocation
+                            execTimeList[al]= execTime
                     except ZeroDivisionError:
-                        execTimeList.append(None)
-                    tempVMIndex = tempVMIndex + 1
-            del maxMinList [maxMinList.index(taskSelectedIndex)]
+                        #execTimeList[al] = sys.float_info.max
+                        continue
+                    #tempVMIndex = tempVMIndex + 1
+                al = al + 1
+            maximumExecTime  = max(execTimeList)
+	    #print "exec list",execTimeList
+            taskSelectedIndex = execTimeList.index(maximumExecTime)
+            #print "taskselectedindex",taskSelectedIndex
+            #print "allocation_list",allocation_list 
+            vmIndex = allocation_list[taskSelectedIndex].assignedVMGlobalId
+            allocation = allocation_list[taskSelectedIndex]
+            del maxMinList [taskSelectedIndex]
 
             #SLA violation calculation
             SLAVMi = SLAVMi + (self.workflow.taskDict.get(allocation.taskId).MI - self.vmList[vmIndex].currentAvailableMips)

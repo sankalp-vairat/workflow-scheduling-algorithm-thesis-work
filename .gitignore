@@ -5,3 +5,5 @@ generator/*.pyc
 *.xml
 *.txt
 *.settings
+*.dax
+*.result

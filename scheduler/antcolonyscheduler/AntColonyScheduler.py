@@ -55,7 +55,7 @@ global no_Of_Ants
 no_Of_Ants = 30
 
 global iterations
-iterations = 10
+iterations = 100
 
 global pheromone_task_level
 pheromone_task_level = []
@@ -77,7 +77,7 @@ rho_VM = 0.2
 
 global noOfVMs
 noOfVMs = 0
-
+400
 global DAG_row
 DAG_row = 0
 
@@ -110,7 +110,7 @@ class AntColonyScheduler(CloudletScheduler):
         '''
         Function:    Initialize all the parameters such as number of tasks ,number of VMs, dimensions of DAG,VM
         Input:       DAG, VM, pheromone
-        Output:      none
+        Output:      none400
         
         '''
         #print "Initializing parameters......."
@@ -494,8 +494,8 @@ class AntColonyScheduler(CloudletScheduler):
                 utilizationMips = utilizationMips + tasksList[i+1].MI
                 flag =False
             else:
-                EnergyConsumed = host.getEnergyDefinedHost(totalUtilizationMips,host.getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
-                #EnergyConsumed = host.getEnergy(totalUtilizationMips,host.getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                #EnergyConsumed = host.getEnergyDefinedHost(totalUtilizationMips,host.getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                EnergyConsumed = host.getEnergy(totalUtilizationMips,host.getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
                 energyConsumed.append(EnergyConsumed)
                 totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
                 totalUtilizationMips = totalUtilizationMips - utilizationMips
@@ -565,8 +565,8 @@ class AntColonyScheduler(CloudletScheduler):
                     utilizationMips = utilizationMips + tasksList[i+1].MI
                     flag =False
                 else:
-                    EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
-                    #EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    #EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
                     energyConsumedByHost.append(EnergyConsumed)
                     totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
                     hostDict.get(hostID).utilizationMips = hostDict.get(hostID).utilizationMips - utilizationMips
@@ -622,6 +622,9 @@ class AntColonyScheduler(CloudletScheduler):
 
         #print "Executing ACO"
         #print "ACO_LIST",ACO_list
+
+        while(global_queue.qsize() != 0):
+            ACO_list.append(global_queue.get())
 
         global total_time
         global no_Of_Ants
@@ -909,11 +912,12 @@ class AntColonyScheduler(CloudletScheduler):
             pass
         # Clearing the dependencies----------------------------------------------------------------------------------------------------------
         for i in range(len(ACO_list)):
-            for j in range(DAG_column):
+            for j in range(self.DAG_matrix.DAGRows):
                 if(self.DAG_matrix.DAG[j][ACO_list[i]]==1):
                     self.DAG_matrix.dependencyMatrix[j]=self.DAG_matrix.dependencyMatrix[j]-1
                     if(self.DAG_matrix.dependencyMatrix[j]==0):
-                        self.__synchronizedQueue(2, j)
+                        #self.__synchronizedQueue(2, j)
+                        global_queue.put(j)
         
 
         # reset ACO_List
@@ -957,6 +961,9 @@ class AntColonyScheduler(CloudletScheduler):
             print "Makespan::",total_time
             
             cloudletSchedulerUtil.printf("Makespan::"+str(total_time))
+        else:
+            if(global_queue.qsize() != 0):
+                self.__ACOScheduler()
 
 
     def execute(self,cloudlet,dataCentre):
@@ -977,11 +984,12 @@ class AntColonyScheduler(CloudletScheduler):
         
         self.__initializeParameters()
         for rootTaskIndex in rootTasksIndexes:
-            self.__synchronizedQueue(2,rootTaskIndex)
+            #self.__synchronizedQueue(2,rootTaskIndex)
+            global_queue.put(rootTaskIndex)
             
-        starting_thread = Thread(target = self.__ACOSchedulerUtil(), args = ())
-        starting_thread.start()
-
+        #starting_thread = Thread(target = self.__ACOSchedulerUtil(), args = ())
+        #starting_thread.start()
+	    self.__ACOScheduler()
 
     def __synchronizedQueue(self,choice,pos):
         '''

@@ -214,8 +214,8 @@ class MinMinScheduler(CloudletScheduler):
                     utilizationMips = utilizationMips + tasksList[i+1].MI
                     flag =False
                 else:
-                    EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
-                    #EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    #EnergyConsumed = hostDict.get(hostID).getEnergyDefinedHost(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
+                    EnergyConsumed = hostDict.get(hostID).getEnergy(hostDict.get(hostID).utilizationMips,hostDict.get(hostID).getTotalMips(),(tasksList[i].currentCompletionTime-timeSlice))
                     energyConsumedByHost.append(EnergyConsumed)
                     totalEnergyConsumed =  totalEnergyConsumed + EnergyConsumed
                     hostDict.get(hostID).utilizationMips = hostDict.get(hostID).utilizationMips - utilizationMips
