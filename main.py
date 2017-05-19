@@ -27,6 +27,7 @@ from power.PowerModelOur import PowerModelOur
 from scheduler.CloudletSchedulerUtil import CloudletSchedulerUtil
 import os
 import multiprocessing
+import webbrowser
 #syntheticGenerator =SyntheticGenerator('Epigenomics_24.xml')
 #syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
 
@@ -38,10 +39,13 @@ powerModelOur = PowerModelOur()
 dataCentre.setUpDatacentre(100,100,20, 5,powerModelOur)
 #dataCentre.setUpDefinedDatacentre(5,200)
 #noOfTasks, noOfLevels, runTimeLowerBound, runTimeUpperBound, storageLowerBound, storageUpperBound, miLowerBound, miUpperBound, type 
-#randomGenerator = RandomWorkFlowGenerator(100,10,1,10,1,10,1000,10000,'RandomParallelWorkFlow')
-#workflow = randomGenerator.randomWorkFlowGenerator()
-syntheticGenerator =SyntheticGenerator('CYBERSHAKE.n.100.0.dax')
-workflow = syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
+randomGenerator = RandomWorkFlowGenerator(100,10,1,10,1,10,1000,10000,'RandomWorkFlow')
+workflow = randomGenerator.randomWorkFlowGenerator()
+webbrowser.open('file:///home/itadmin/Documents/LiClipse%20Workspace/Major/index.html')
+#syntheticGenerator =SyntheticGenerator('CYBERSHAKE.n.100.0.dax')
+#workflow = syntheticGenerator.generateSyntheticWorkFlow(1000, 10000)
+
+
 
 workflow.createTaskDictionary()
 myopic = MyopicScheduler()
@@ -300,7 +304,7 @@ cloudletScheduler.executeScheduler(cloudlet,dataCentre)
 print "ACO ended"
 cloudletSchedulerUtil.printf("ACO ended");
 cloudletSchedulerUtil.printf("-------------------------------------------------------------------------------------------------")
-#--------------------------------------------------------------------------------------------------------------------------------
+
 '''
 import theano.tensor as T
 import numpy

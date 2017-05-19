@@ -115,7 +115,12 @@ class RandomWorkFlowGenerator(RandomGenerator):
             return self.randomParallel(noOfTasks, noOfLevels, UniformDistribution(runTimeLowerBound, runTimeUpperBound), UniformDistribution(storageLowerBound, storageUpperBound),UniformDistribution(miLowerBound, miUpperbound))
         elif(type == 'RandomForkJoinWorkFlow'):
             return self.randomForkJoin(noOfTasks, noOfLevels, UniformDistribution(runTimeLowerBound, runTimeUpperBound), UniformDistribution(storageLowerBound, storageUpperBound),UniformDistribution(miLowerBound, miUpperbound))
-
+    
+    def __writeJson(self,st):
+        f= open("Output.json","a+")
+        f.write(st)
+        #f.write("\n");
+        f.close()
 
     def randomLevel(self,N, L, runtimeDist,sizeDist,miDist):
         #    Approximate width of workflow
@@ -125,7 +130,8 @@ class RandomWorkFlowGenerator(RandomGenerator):
         max_id = int(math.floor(W/float(2)))
     
         w = WorkFlow(name="randomLevel", description="""Random Level-Oriented Workflow""")
-    
+        self.__writeJson("{\n")
+        self.__writeJson("\"nodes\": [\n")
         tasks = []
         levels = [list() for l in range(0,L)]
         for i in range(0,N):
@@ -135,24 +141,34 @@ class RandomWorkFlowGenerator(RandomGenerator):
             tasks.append(t)
         
             if i < L: # Ensure each level gets one task
+                self.__writeJson("{\"id\": \""+t.id+"\", \"group\":"+ str(i)+"},\n")
                 levels[i].append(t)
             else:
                 level = random.randint(0,L-1)
+                if(i <N-1 ):
+                    self.__writeJson("{\"id\": \""+t.id+"\", \"group\":"+ str(level)+"},\n")
+                else:
+                    self.__writeJson("{\"id\": \""+t.id+"\", \"group\":"+ str(level)+"}\n],\n")
                 levels[level].append(t)
     
         # Choose random children for root level
         # Make sure each root task gets a child
+        self.__writeJson("\"links\": [\n")
         for t in levels[0]:
             k = random.randint(1, min(max_id, len(levels[1])))
-        
+            
             children = random.sample(levels[1], k)
         
             for c in children:
+                self.__writeJson("{\"source\": \""+t.id+"\", \"target\": \""+c.id+"\", \"value\": 1},\n")
                 for i in t.outputs:
                     c.addInput(i)
+                    
     
         # For levels 1..L choose random parents
         for l in range(1,L):
+            op = len(levels[l])
+            o1 = 0
             for t in levels[l]:
                 k = random.randint(1, min(max_id, len(levels[l-1])))
             
@@ -160,10 +176,19 @@ class RandomWorkFlowGenerator(RandomGenerator):
                 k = max(0, k - len(t.inputs))
             
                 parents = random.sample(levels[l-1], k)
+                u = len(parents)
+                u1 = 0
                 for p in parents:
+                    
+                    if(l == (L-1) and u1 == (u-1) and o1 == (op-1)):
+                        self.__writeJson("{\"source\": \""+p.id+"\", \"target\": \""+t.id+"\", \"value\": 1}\n")
+                    else:
+                        self.__writeJson("{\"source\": \""+p.id+"\", \"target\": \""+t.id+"\", \"value\": 1},\n")
                     for o in p.outputs:
                         t.addInput(o)
-    
+                    u1 = u1 + 1
+                o1 = o1 + 1
+        self.__writeJson("]\n}")
         return w
 
 
